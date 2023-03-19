@@ -11,6 +11,10 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/commonModelUtil" />
+            <option value="$PROJECT_DIR$/coreData" />
+            <option value="$PROJECT_DIR$/coreDomain" />
+            <option value="$PROJECT_DIR$/coreNetwork" />
           </set>
         </option>
       </GradleProjectSettings>
