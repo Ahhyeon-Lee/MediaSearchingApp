@@ -11,6 +11,8 @@ dependencies {
 
     implementation(libs.bundles.android)
     implementation(libs.bundles.androidx)
+    implementation(libs.gson)
+    implementation(libs.glide)
     implementation(libs.bundles.junit)
 
     implementation(libs.hilt.android)

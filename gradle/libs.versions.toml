@@ -23,6 +23,7 @@ okhttp = "4.10.0"
 retrofit2 = "2.9.0"
 retrofit2CoroutinesAdapter = "0.9.2"
 
+glide = "4.14.2"
 
 [libraries]
 android-material = { module = "com.google.android.material:material", version.ref = "android-material" }
@@ -52,6 +53,8 @@ retrofit-converter-scalars = { module = "com.squareup.retrofit2:converter-scalar
 retrofit-jakewharton-flow-adapter = { module = "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter", version.ref = "retrofit2CoroutinesAdapter" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
+
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradle" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }

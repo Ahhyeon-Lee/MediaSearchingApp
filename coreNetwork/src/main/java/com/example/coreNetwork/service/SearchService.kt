@@ -1,6 +1,6 @@
 package com.example.coreNetwork.service
 
-import com.example.commonModelUtil.ImageSearchResponseData
+import com.example.commonModelUtil.search.ImageSearchResponseData
 import kotlinx.coroutines.flow.Flow
 import retrofit2.http.GET
 import retrofit2.http.Query

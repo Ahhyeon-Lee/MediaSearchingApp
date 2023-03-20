@@ -7,8 +7,7 @@ class SearchRepositoryImpl @Inject constructor(
     private val dataSource: SearchDataSource
 ): SearchRepository {
 
-    override fun getImageSearchResult(query: String, page: Int) {
+    override fun getImageSearchResult(query: String, page: Int) =
         dataSource.getImageSearchResult(query, page)
-    }
 
 }

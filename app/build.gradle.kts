@@ -36,6 +36,7 @@ dependencies {
     implementation(libs.bundles.android)
     implementation(libs.bundles.androidx)
     implementation(libs.bundles.junit)
+    implementation(libs.glide)
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
