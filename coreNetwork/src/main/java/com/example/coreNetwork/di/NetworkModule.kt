@@ -20,7 +20,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    val apiKey = ""
+    val apiKey = "568d8bac516d6d541580d907ce5ad4fc"
 
     @Singleton
     @Provides

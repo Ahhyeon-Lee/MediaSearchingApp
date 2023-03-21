@@ -5,6 +5,9 @@
 
     <data>
 
+        <variable
+            name="viewModel"
+            type="com.example.mediasearchingapp.viewmodel.SearchViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,15 +22,28 @@
             android:layout_marginHorizontal="15dp"
             android:layout_marginVertical="10dp"
             android:background="@drawable/bg_search_edit_text"
-            android:drawableRight="@drawable/ic_search"
-            android:drawableTint="@color/gray_darker"
             android:elevation="5dp"
             android:hint="@string/hint_search"
             android:imeOptions="actionSearch"
             android:inputType="text"
-            android:paddingHorizontal="20dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="45dp"
             android:textColorHint="@color/gray"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/btnTypeDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:background="@color/transparent"
+            android:elevation="5dp"
+            android:paddingEnd="20dp"
+            android:src="@{viewModel.isTyping ? @drawable/ic_close : @drawable/ic_search}"
+            app:layout_constraintBottom_toBottomOf="@id/etSearch"
+            app:layout_constraintEnd_toEndOf="@id/etSearch"
+            app:layout_constraintTop_toTopOf="@id/etSearch"
+            app:tint="@color/gray_darker"
+            tools:src="@drawable/ic_search" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvSearch"

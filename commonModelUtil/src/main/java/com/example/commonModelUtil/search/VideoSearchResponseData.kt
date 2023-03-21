@@ -1,5 +1,6 @@
 package com.example.commonModelUtil.search
 
+import com.example.commonModelUtil.extension.convertDateString
 import com.google.gson.annotations.SerializedName
 
 data class VideoSearchResponseData(
@@ -11,6 +12,6 @@ data class VideoDocumentData(
     val title: String,
     val thumbnail: String,
     val url: String,
-    @SerializedName("play_time") val playTime: Int,
+    val play_time: Int,
     val datetime: String,
 )

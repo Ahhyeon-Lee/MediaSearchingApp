@@ -24,7 +24,7 @@ interface LifecycleOwnerWrapper {
         error: suspend (Throwable?) -> Unit = {},
         errorWithData: suspend (Pair<Throwable?, T>) -> Unit = {},
         finish: suspend () -> Unit = {},
-    ): Job = onUiState(
+    ): Job = onEachState(
         loading,
         success,
         error,

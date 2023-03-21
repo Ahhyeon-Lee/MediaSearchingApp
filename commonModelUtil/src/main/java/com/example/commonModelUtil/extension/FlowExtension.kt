@@ -16,7 +16,7 @@ fun <T> Flow<T>.resultState(): Flow<ResultState<T>> {
 }
 
 /** 로딩, 성공, 에러, 에러 with data, 완료시 각각 다른 처리를 해야할 때 사용 */
-fun <T> Flow<ResultState<T>>.onUiState(
+fun <T> Flow<ResultState<T>>.onEachState(
     loading: suspend () -> Unit = {},
     success: suspend (T) -> Unit = {},
     error: suspend (Throwable?) -> Unit = {},
@@ -48,7 +48,7 @@ inline fun <T> Flow<ResultState<T>>.onState(
     coroutineScope: CoroutineScope,
     crossinline collect: (ResultState<T>) -> Unit
 ) {
-    onUiState(
+    onEachState(
         loading = { collect(ResultState.Loading) },
         success = { collect(ResultState.Success(it)) },
         error = { collect(ResultState.Error(it)) },
@@ -62,7 +62,7 @@ inline fun <T, F> Flow<ResultState<T>>.onStateAppend(
     arguments: F,
     crossinline collect: (ResultState<Pair<T, F>>) -> Unit
 ) {
-    onUiState(
+    onEachState(
         loading = { collect(ResultState.Loading) },
         success = { collect(ResultState.Success(Pair(it, arguments))) },
         error = { collect(ResultState.Error(it)) },

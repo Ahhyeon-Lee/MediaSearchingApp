@@ -1,5 +1,6 @@
 package com.example.commonModelUtil.search
 
+import com.example.commonModelUtil.extension.convertDateString
 import com.google.gson.annotations.SerializedName
 
 data class ImageSearchResponseData(
@@ -13,13 +14,9 @@ data class MetaData(
 
 data class ImageDocumentData(
     val collection: String,
-    @SerializedName("thumbnail_url") val thumbnailUrl: String,
-    @SerializedName("image_url") val imageUrl: String,
+    val thumbnail_url: String,
+    val image_url: String,
     val width: Int,
     val height: Int,
     val datetime: String,
-) {
-    fun getTime() {
-
-    }
-}
+)
