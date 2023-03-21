@@ -4,8 +4,7 @@ import android.content.Context
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import com.example.commonModelUtil.extension.layoutInflater
-import com.example.commonModelUtil.extension.setImage
-import com.example.commonModelUtil.search.SearchData
+import com.example.commonModelUtil.search.SearchListData
 import com.example.mediasearchingapp.base.BaseAdapter
 import com.example.mediasearchingapp.base.BaseViewHolder
 import com.example.mediasearchingapp.databinding.ItemSearchImageBinding
@@ -13,7 +12,7 @@ import com.example.mediasearchingapp.databinding.ItemSearchVideoBinding
 
 class SearchAdapter(
     private val context: Context,
-) : BaseAdapter<ViewDataBinding, SearchData>() {
+) : BaseAdapter<ViewDataBinding, SearchListData>() {
 
     companion object {
         enum class SearchType {
@@ -21,9 +20,15 @@ class SearchAdapter(
         }
     }
 
+    fun addSearchList(list: List<SearchListData>) {
+        val startPosition = adapterList.lastIndex
+        adapterList.addAll(list)
+        notifyItemRangeInserted(startPosition, list.size)
+    }
+
     override fun getItemViewType(position: Int): Int {
         return when (adapterList.getOrNull(position)) {
-            is SearchData.ImageDocumentData -> SearchType.IMAGE.ordinal
+            is SearchListData.ImageDocumentData -> SearchType.IMAGE.ordinal
             else -> SearchType.VIDEO.ordinal
         }
     }
@@ -43,7 +48,7 @@ class SearchAdapter(
         }
     }
 
-    abstract inner class BaseMediaViewHolder<T : ViewDataBinding, V : SearchData>(
+    abstract inner class BaseMediaViewHolder<T : ViewDataBinding, V : SearchListData>(
         override val binding: T
     ) : BaseViewHolder<ViewDataBinding>(binding) {
         lateinit var data: V
@@ -57,7 +62,7 @@ class SearchAdapter(
 
     inner class ImageViewHolder(
         binding: ItemSearchImageBinding
-    ) : BaseMediaViewHolder<ItemSearchImageBinding, SearchData.ImageDocumentData>(binding) {
+    ) : BaseMediaViewHolder<ItemSearchImageBinding, SearchListData.ImageDocumentData>(binding) {
         override fun initViewHolder(): Unit = with(binding) {
             imageData = data
         }
@@ -65,7 +70,7 @@ class SearchAdapter(
 
     inner class VideoViewHolder(
         binding: ItemSearchVideoBinding
-    ) : BaseMediaViewHolder<ItemSearchVideoBinding, SearchData.VideoDocumentData>(binding) {
+    ) : BaseMediaViewHolder<ItemSearchVideoBinding, SearchListData.VideoDocumentData>(binding) {
         override fun initViewHolder(): Unit = with(binding) {
             videoData = data
         }

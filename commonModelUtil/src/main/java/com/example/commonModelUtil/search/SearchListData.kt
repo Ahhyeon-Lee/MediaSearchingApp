@@ -2,9 +2,8 @@ package com.example.commonModelUtil.search
 
 import com.example.commonModelUtil.extension.convertDateString
 import com.example.commonModelUtil.extension.getDate
-import com.google.gson.annotations.SerializedName
 
-sealed class SearchData {
+sealed class SearchListData {
 
     open val datetime: String = ""
     fun getConvertedDate() = datetime.convertDateString()
@@ -17,7 +16,7 @@ sealed class SearchData {
         val width: Int,
         val height: Int,
         override val datetime: String,
-    ) : SearchData()
+    ) : SearchListData()
 
     data class VideoDocumentData(
         val title: String,
@@ -25,5 +24,5 @@ sealed class SearchData {
         val videoUrl: String,
         val playTime: Int,
         override val datetime: String,
-    ) : SearchData()
+    ) : SearchListData()
 }

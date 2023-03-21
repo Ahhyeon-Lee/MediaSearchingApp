@@ -9,10 +9,9 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.commonModelUtil.ResultState
+import androidx.recyclerview.widget.RecyclerView
 import com.example.commonModelUtil.extension.getWindowWidth
 import com.example.commonModelUtil.extension.onEachState
-import com.example.commonModelUtil.search.SearchData
 import com.example.mediasearchingapp.adapter.SearchAdapter
 import com.example.mediasearchingapp.base.BaseFragment
 import com.example.mediasearchingapp.databinding.FragmentSearchBinding
@@ -55,11 +54,15 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
             }
             setOnEditorActionListener { textView, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    searchViewModel.search(textView.text.toString())
+                    searchViewModel.resetNewQuerySearch(textView.text.toString())
+                    searchViewModel.search()
                 }
                 true
             }
         }
+
+        rvSearch.addOnScrollListener(scrollListener)
+
         btnTypeDelete.setOnClickListener {
             etSearch.text.clear()
         }
@@ -68,31 +71,24 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
     private fun collectViewModel() = with(searchViewModel) {
         searchResult.onEachState(
             success = {
-                searchAdapter.set(it)
+                if (isNewQuerySearch) {
+                    searchAdapter.set(it)
+                    isNewQuerySearch = false
+                } else {
+                    searchAdapter.addSearchList(it)
+                }
             },
             error = {
                 Log.i("아현", "searchResult : $this")
             }
         ).launchIn(viewLifecycleOwner.lifecycleScope)
+    }
 
-        imageResponseData.zip(videoResponseData) { imageResult, videoResult ->
-            mutableListOf<SearchData>().apply {
-                if(imageResult is ResultState.Success) {
-                    addAll(imageResult.data)
-                }
-                if(videoResult is ResultState.Success) {
-                    addAll(videoResult.data)
-                }
-            }.sortedByDescending {
-                it.getDate()
+    private val scrollListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            if (!recyclerView.canScrollVertically(1)) {
+                searchViewModel.search()
             }
-        }.onEach {
-            if (it.isNotEmpty()) {
-                Log.i("아현", "onEachList : ${it.map { it.getConvertedDate() }} / ${it.size}")
-                searchAdapter.set(it)
-            }
-        }.catch {
-            Log.i("아현", "searchDataError : $this")
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
+        }
     }
 }
