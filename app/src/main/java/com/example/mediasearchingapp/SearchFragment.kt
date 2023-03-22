@@ -9,9 +9,12 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.commonModelUtil.extension.getWindowWidth
 import com.example.commonModelUtil.extension.onEachState
+import com.example.commonModelUtil.search.SearchListData
 import com.example.mediasearchingapp.adapter.SearchAdapter
 import com.example.mediasearchingapp.base.BaseFragment
 import com.example.mediasearchingapp.databinding.FragmentSearchBinding
@@ -25,7 +28,11 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
     override val enableBackPressed = true
     private val searchViewModel: SearchViewModel by viewModels()
     private val searchAdapter by lazy {
-        SearchAdapter(requireContext())
+        SearchAdapter(requireContext(), onItemClicked)
+    }
+
+    private val onItemClicked: (Boolean, SearchListData) -> Unit = { isFavorite, data ->
+        // todo: preference에 성공적으로 저장하면 뷰홀더에 버튼 채워진 하트로 변경하는 함수 호출
     }
 
     override fun createFragmentBinding(
@@ -41,8 +48,13 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
         addListener()
         collectViewModel()
         with(rvSearch) {
-            val columnCnt = requireActivity().getWindowWidth() / 150.px
-            layoutManager = GridLayoutManager(requireContext(), columnCnt)
+            val thumbnailWidth =
+                context.resources.getDimension(R.dimen.search_thumbnail_width).toInt()
+            val columnCnt = requireActivity().getWindowWidth() / thumbnailWidth
+            layoutManager =
+                StaggeredGridLayoutManager(columnCnt, LinearLayoutManager.VERTICAL).apply {
+                    gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
+                }
             adapter = searchAdapter
         }
     }

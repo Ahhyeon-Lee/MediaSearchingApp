@@ -20,7 +20,8 @@ class GetVideoSearchResultUseCase @Inject constructor(
                         it.thumbnail,
                         it.url,
                         it.play_time,
-                        it.datetime
+                        it.datetime,
+                        false
                     )
                 }
             )

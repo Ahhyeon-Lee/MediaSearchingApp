@@ -21,7 +21,8 @@ class GetImageSearchResultUseCase @Inject constructor(
                         it.image_url,
                         it.width,
                         it.height,
-                        it.datetime
+                        it.datetime,
+                        false
                     )
                 }
             )

@@ -6,6 +6,8 @@ import com.example.commonModelUtil.extension.getDate
 sealed class SearchListData {
 
     open val datetime: String = ""
+    open var isFavorite: Boolean = false
+
     fun getConvertedDate() = datetime.convertDateString()
     fun getDate() = datetime.getDate()
 
@@ -16,6 +18,7 @@ sealed class SearchListData {
         val width: Int,
         val height: Int,
         override val datetime: String,
+        override var isFavorite: Boolean
     ) : SearchListData()
 
     data class VideoDocumentData(
@@ -24,5 +27,6 @@ sealed class SearchListData {
         val videoUrl: String,
         val playTime: Int,
         override val datetime: String,
+        override var isFavorite: Boolean
     ) : SearchListData()
 }

@@ -1,10 +1,12 @@
 package com.example.mediasearchingapp.adapter
 
 import android.content.Context
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import com.example.commonModelUtil.extension.layoutInflater
 import com.example.commonModelUtil.search.SearchListData
+import com.example.mediasearchingapp.R
 import com.example.mediasearchingapp.base.BaseAdapter
 import com.example.mediasearchingapp.base.BaseViewHolder
 import com.example.mediasearchingapp.databinding.ItemSearchImageBinding
@@ -12,6 +14,7 @@ import com.example.mediasearchingapp.databinding.ItemSearchVideoBinding
 
 class SearchAdapter(
     private val context: Context,
+    private val onClick: (Boolean, SearchListData) -> Unit
 ) : BaseAdapter<ViewDataBinding, SearchListData>() {
 
     companion object {
@@ -50,7 +53,7 @@ class SearchAdapter(
 
     abstract inner class BaseMediaViewHolder<T : ViewDataBinding, V : SearchListData>(
         override val binding: T
-    ) : BaseViewHolder<ViewDataBinding>(binding) {
+    ) : BaseViewHolder<ViewDataBinding>(binding), View.OnClickListener {
         lateinit var data: V
         override fun bind(position: Int) {
             data = adapterList[position] as V
@@ -58,6 +61,18 @@ class SearchAdapter(
         }
 
         abstract fun initViewHolder()
+
+        override fun onClick(view: View?) {
+            when (view?.id) {
+                R.id.btnFavorite -> {
+                    onClick.invoke(view.isSelected, data)
+                }
+            }
+        }
+
+        fun updateBtnFavorite() {
+
+        }
     }
 
     inner class ImageViewHolder(
@@ -65,6 +80,9 @@ class SearchAdapter(
     ) : BaseMediaViewHolder<ItemSearchImageBinding, SearchListData.ImageDocumentData>(binding) {
         override fun initViewHolder(): Unit = with(binding) {
             imageData = data
+            val thumbWidth = context.resources.getDimension(R.dimen.search_thumbnail_width).toInt()
+            ivThumbnail.layoutParams.height = data.height * thumbWidth / data.width
+            btnFavorite.isSelected = data.isFavorite
         }
     }
 
@@ -73,6 +91,7 @@ class SearchAdapter(
     ) : BaseMediaViewHolder<ItemSearchVideoBinding, SearchListData.VideoDocumentData>(binding) {
         override fun initViewHolder(): Unit = with(binding) {
             videoData = data
+            btnFavorite.isSelected = data.isFavorite
         }
     }
 }
