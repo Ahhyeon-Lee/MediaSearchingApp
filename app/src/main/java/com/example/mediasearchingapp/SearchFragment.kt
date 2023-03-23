@@ -34,6 +34,14 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
     override val enableBackPressed = false
     private val searchViewModel: SearchViewModel by viewModels()
+    private val staggeredGridLayoutManager by lazy {
+        val thumbWidth =
+            context?.resources?.getDimension(R.dimen.search_thumbnail_width)?.toInt() ?: 150.px
+        val columnCnt = requireActivity().getWindowWidth() / thumbWidth
+        StaggeredGridLayoutManager(columnCnt, LinearLayoutManager.VERTICAL).apply {
+            gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
+        }
+    }
     private val searchAdapter by lazy {
         SearchAdapter(requireContext(), onItemClicked)
     }
@@ -59,12 +67,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
         addListener()
         collectViewModel()
         rvSearch.apply {
-            val thumbWidth = context.resources.getDimension(R.dimen.search_thumbnail_width).toInt()
-            val columnCnt = requireActivity().getWindowWidth() / thumbWidth
-            layoutManager =
-                StaggeredGridLayoutManager(columnCnt, LinearLayoutManager.VERTICAL).apply {
-                    gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
-                }
+            layoutManager = staggeredGridLayoutManager
             itemAnimator = null
             adapter = searchAdapter
         }
@@ -89,6 +92,12 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
         btnTypeDelete.setOnClickListener {
             etSearch.text.clear()
         }
+
+        btnUp.setOnClickListener {
+            if (it.alpha != 0f) {
+                rvSearch.scrollToPosition(0)
+            }
+        }
     }
 
     private fun collectViewModel() = with(searchViewModel) {
@@ -111,9 +120,17 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
     private val scrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-            if (!recyclerView.canScrollVertically(1)) {
+            if (!recyclerView.canScrollVertically(1) && searchAdapter.itemCount > 0) {
                 searchViewModel.search()
             }
+        }
+
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+            val positions = staggeredGridLayoutManager.findFirstVisibleItemPositions(
+                IntArray(staggeredGridLayoutManager.spanCount)
+            )
+            searchViewModel.showBtnUp(positions[0] > 9)
         }
     }
 

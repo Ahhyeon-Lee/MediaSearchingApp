@@ -26,6 +26,8 @@ class SearchViewModel @Inject constructor(
     val searchResult = _searchResult.asStateFlow()
     private val _isTyping = MutableStateFlow(false)
     val isTyping = _isTyping.asStateFlow()
+    private val _showBtnUp = MutableStateFlow<Boolean?>(null)
+    val showBtnUp = _showBtnUp.asStateFlow()
     var currentQuery = ""
     var isImageSearchEnd = false
     var isVideoSearchEnd = false
@@ -35,6 +37,10 @@ class SearchViewModel @Inject constructor(
 
     fun setTyping(state: Boolean) {
         _isTyping.value = state
+    }
+
+    fun showBtnUp(state: Boolean) {
+        _showBtnUp.value = state
     }
 
     fun resetNewQuerySearch(query: String) {

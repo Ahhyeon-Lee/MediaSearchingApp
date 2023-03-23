@@ -40,14 +40,4 @@ interface LifecycleOwnerWrapper {
         observe(initLifecycleOwner(), observer)
     }
 
-    fun View.setFirstClickEvent(
-        windowDuration: Long = 1000,
-        onClick: () -> Unit,
-    ) {
-        clicks()
-            .throttleFirst(windowDuration)
-            .onEach { onClick.invoke() }
-            .launchIn(initLifecycleOwner().lifecycleScope)
-    }
-
 }

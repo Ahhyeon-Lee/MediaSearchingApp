@@ -19,4 +19,14 @@ object CommonBindingAdapter {
     fun imageUrl(view: ImageView, url: String) {
         view.setImage(url, R.drawable.ic_error, R.drawable.bg_thumbnail)
     }
+
+    @BindingAdapter("showAlpha")
+    @JvmStatic
+    fun showAlpha(view: View, state: Boolean?) {
+        if (state == null) return
+        view.animate()
+            .alpha(if (state) 1f else 0f)
+            .setDuration(200)
+            .start()
+    }
 }
