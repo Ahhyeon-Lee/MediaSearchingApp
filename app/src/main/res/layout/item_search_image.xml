@@ -24,12 +24,11 @@
             <ImageView
                 android:id="@+id/ivThumbnail"
                 clipToOutLine="@{true}"
-                imageUrl="@{imageData.thumbnail}"
+                imageUrl="@{imageData.imageUrl}"
                 android:layout_width="@dimen/search_thumbnail_width"
                 android:layout_height="150dp"
                 android:adjustViewBounds="true"
                 android:background="@drawable/bg_thumbnail"
-                android:maxHeight="300dp"
                 android:scaleType="centerCrop"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

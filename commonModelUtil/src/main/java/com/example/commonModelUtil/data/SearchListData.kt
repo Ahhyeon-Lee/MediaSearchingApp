@@ -4,10 +4,6 @@ import com.example.commonModelUtil.extension.convertDateString
 import com.example.commonModelUtil.extension.getDate
 import com.example.commonModelUtil.extension.toTimeFormat
 
-data class FavoriteData(
-    val list: ArrayList<SearchListData> = arrayListOf()
-)
-
 sealed class SearchListData {
 
     @Transient

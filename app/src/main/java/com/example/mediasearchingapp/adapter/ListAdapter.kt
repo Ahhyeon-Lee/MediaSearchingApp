@@ -79,7 +79,6 @@ class ListAdapter(
                 setOnClickListener {
                     onItemClick(it)
                 }
-                requestLayout()
             }
         }
     }
@@ -94,7 +93,6 @@ class ListAdapter(
                 setOnClickListener {
                     onItemClick(it)
                 }
-                requestLayout()
             }
         }
     }
@@ -102,8 +100,7 @@ class ListAdapter(
     class DiffUtilCallback(
         private val oldList: List<SearchListData>,
         private val newList: List<SearchListData>
-    ) :
-        DiffUtil.Callback() {
+    ) : DiffUtil.Callback() {
         override fun getOldListSize(): Int = oldList.size
 
         override fun getNewListSize(): Int = newList.size

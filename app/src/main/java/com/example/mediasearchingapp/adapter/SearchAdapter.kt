@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.commonModelUtil.data.MediaType
 import com.example.commonModelUtil.extension.layoutInflater
 import com.example.commonModelUtil.data.SearchListData
+import com.example.commonModelUtil.extension.toPx
 import com.example.mediasearchingapp.R
 import com.example.mediasearchingapp.base.BaseAdapter
 import com.example.mediasearchingapp.base.BaseViewHolder
@@ -93,14 +94,14 @@ class SearchAdapter(
     ) : BaseMediaViewHolder<ItemSearchImageBinding, SearchListData.ImageDocumentData>(binding) {
         override fun initViewHolder(): Unit = with(binding) {
             val thumbWidth = context.resources.getDimension(R.dimen.search_thumbnail_width).toInt()
-            ivThumbnail.layoutParams.height = data.height * thumbWidth / data.width
+            val height = (data.height * thumbWidth / data.width).takeIf { it <= 300.toPx(context) } ?: 300.toPx(context)
+            ivThumbnail.layoutParams.height = height
             imageData = data
             btnFavorite.apply {
                 isSelected = data.isFavorite
                 setOnClickListener {
                     onItemClick(it)
                 }
-                requestLayout()
             }
         }
 
@@ -113,13 +114,15 @@ class SearchAdapter(
         binding: ItemSearchVideoBinding
     ) : BaseMediaViewHolder<ItemSearchVideoBinding, SearchListData.VideoDocumentData>(binding) {
         override fun initViewHolder(): Unit = with(binding) {
+            val thumbWidth = context.resources.getDimension(R.dimen.search_thumbnail_width).toInt()
+            val height = 78 * thumbWidth / 138
+            ivThumbnail.layoutParams.height = height
             videoData = data
             btnFavorite.apply {
                 isSelected = data.isFavorite
                 setOnClickListener {
                     onItemClick(it)
                 }
-                requestLayout()
             }
         }
 

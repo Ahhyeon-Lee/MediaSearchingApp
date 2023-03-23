@@ -24,7 +24,7 @@
             <ImageView
                 android:id="@+id/ivThumbnail"
                 clipToOutLine="@{true}"
-                imageUrl="@{imageData.thumbnail}"
+                imageUrl="@{imageData.imageUrl}"
                 android:layout_width="@dimen/list_thumbnail_width"
                 android:layout_height="100dp"
                 android:adjustViewBounds="true"

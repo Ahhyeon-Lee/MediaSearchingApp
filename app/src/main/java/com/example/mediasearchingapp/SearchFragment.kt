@@ -63,8 +63,9 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
             val columnCnt = requireActivity().getWindowWidth() / thumbWidth
             layoutManager =
                 StaggeredGridLayoutManager(columnCnt, LinearLayoutManager.VERTICAL).apply {
-                    gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
+                    gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
                 }
+            itemAnimator = null
             adapter = searchAdapter
         }
     }
@@ -84,7 +85,6 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
         }
 
         rvSearch.addOnScrollListener(scrollListener)
-        rvSearch.itemAnimator = null
 
         btnTypeDelete.setOnClickListener {
             etSearch.text.clear()

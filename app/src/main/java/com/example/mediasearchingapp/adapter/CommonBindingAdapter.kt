@@ -4,7 +4,7 @@ import android.view.View
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.example.commonModelUtil.extension.setImage
-import com.example.commonModelUtil.extension.setImageRound
+import com.example.mediasearchingapp.R
 
 object CommonBindingAdapter {
 
@@ -17,12 +17,6 @@ object CommonBindingAdapter {
     @BindingAdapter("imageUrl")
     @JvmStatic
     fun imageUrl(view: ImageView, url: String) {
-        view.setImage(url)
-    }
-
-    @BindingAdapter(value = ["imageUrlRound", "roundRadius"], requireAll = true)
-    @JvmStatic
-    fun imageUrlRound(view: ImageView, url: String, radius: Int) {
-        view.setImageRound(url, radius)
+        view.setImage(url, R.drawable.ic_error, R.drawable.bg_thumbnail)
     }
 }
