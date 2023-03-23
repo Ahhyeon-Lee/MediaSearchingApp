@@ -7,7 +7,7 @@
 
         <variable
             name="videoData"
-            type="com.example.commonModelUtil.search.SearchListData.VideoDocumentData" />
+            type="com.example.commonModelUtil.data.SearchListData.VideoDocumentData" />
     </data>
 
     <LinearLayout
@@ -27,9 +27,9 @@
                 clipToOutLine="@{true}"
                 imageUrl="@{videoData.thumbnail}"
                 android:layout_width="@dimen/search_thumbnail_width"
-                android:layout_height="wrap_content"
+                android:layout_height="150dp"
                 android:adjustViewBounds="true"
-                android:background="@drawable/bg_search_thumbnail"
+                android:background="@drawable/bg_thumbnail"
                 android:maxHeight="300dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -61,7 +61,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="3dp"
-                    android:text="1:06"
+                    android:text="@{videoData.getVideoTime}"
                     android:textColor="@color/white"
                     android:textSize="10dp"
                     app:layout_constraintBottom_toBottomOf="@id/ivIcoVideo"

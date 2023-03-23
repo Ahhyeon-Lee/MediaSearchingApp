@@ -1,11 +1,10 @@
 package com.example.mediasearchingapp.viewmodel
 
-import android.app.Application
-import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import com.example.commonModelUtil.ResultState
 import com.example.commonModelUtil.mutableResultState
-import com.example.commonModelUtil.search.SearchListData
+import com.example.commonModelUtil.data.SearchListData
+import com.example.commonModelUtil.util.PreferenceUtil
 import com.example.coreDomain.usecase.GetImageSearchResultUseCase
 import com.example.coreDomain.usecase.GetVideoSearchResultUseCase
 import com.example.mediasearchingapp.di.IoDispatcher
@@ -17,11 +16,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    app: Application,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val preferenceUtil: PreferenceUtil,
     private val getImageSearchResultUseCase: GetImageSearchResultUseCase,
-    private val getVideoSearchResultUseCase: GetVideoSearchResultUseCase
-) : AndroidViewModel(app) {
+    private val getVideoSearchResultUseCase: GetVideoSearchResultUseCase,
+) : ViewModel() {
 
     private val _searchResult = mutableResultState<List<SearchListData>>()
     val searchResult = _searchResult.asStateFlow()
@@ -60,9 +59,18 @@ class SearchViewModel @Inject constructor(
         }.launchIn(CoroutineScope(ioDispatcher))
     }
 
+    fun getFavoriteList() = preferenceUtil.getFavoriteList().toList()
+
+    private fun getFavoriteImageList() =
+        preferenceUtil.getFavoriteList().filterIsInstance<SearchListData.ImageDocumentData>()
+
+    private fun getFavoriteVideoList() =
+        preferenceUtil.getFavoriteList().filterIsInstance<SearchListData.VideoDocumentData>()
+
     private fun getImageResult(query: String) = flow {
         if (!isImageSearchEnd) {
-            val result = getImageSearchResultUseCase.invoke(query, imageSearchPage)
+            val result =
+                getImageSearchResultUseCase.invoke(query, imageSearchPage, getFavoriteImageList())
             isImageSearchEnd = result.first
             emit(result.second)
         } else {
@@ -78,7 +86,8 @@ class SearchViewModel @Inject constructor(
 
     private fun getVideoResult(query: String) = flow {
         if (!isVideoSearchEnd) {
-            val result = getVideoSearchResultUseCase.invoke(query, videoSearchPage)
+            val result =
+                getVideoSearchResultUseCase.invoke(query, videoSearchPage, getFavoriteVideoList())
             isVideoSearchEnd = result.first
             emit(result.second)
         } else {

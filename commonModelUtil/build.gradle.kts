@@ -14,6 +14,7 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.glide)
     implementation(libs.bundles.junit)
+    implementation(libs.androidx.security.crypto)
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)

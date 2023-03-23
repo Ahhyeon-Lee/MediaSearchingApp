@@ -6,15 +6,15 @@
     <data>
 
         <variable
-            name="imageData"
-            type="com.example.commonModelUtil.data.SearchListData.ImageDocumentData" />
+            name="videoData"
+            type="com.example.commonModelUtil.data.SearchListData.VideoDocumentData" />
     </data>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:paddingVertical="10dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
@@ -24,17 +24,25 @@
             <ImageView
                 android:id="@+id/ivThumbnail"
                 clipToOutLine="@{true}"
-                imageUrl="@{imageData.thumbnail}"
-                android:layout_width="@dimen/search_thumbnail_width"
-                android:layout_height="150dp"
+                imageUrl="@{videoData.thumbnail}"
+                android:layout_width="@dimen/list_thumbnail_width"
+                android:layout_height="100dp"
                 android:adjustViewBounds="true"
                 android:background="@drawable/bg_thumbnail"
-                android:maxHeight="300dp"
                 android:scaleType="centerCrop"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:clipToOutline="true"
                 tools:src="@drawable/cat" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ico_video"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
                 android:id="@+id/btnFavorite"
@@ -48,21 +56,6 @@
                 app:layout_constraintEnd_toEndOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <TextView
-            android:id="@+id/tvDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="4dp"
-            android:ellipsize="end"
-            android:maxWidth="120dp"
-            android:maxLines="2"
-            android:text="@{imageData.getConvertedDate}"
-            android:textAlignment="center"
-            android:textSize="15dp"
-            app:layout_constraintVertical_bias="0.0"
-            tools:text="2023-03-21 09:49" />
 
     </LinearLayout>
 </layout>

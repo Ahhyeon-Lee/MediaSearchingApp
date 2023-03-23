@@ -1,6 +1,5 @@
-package com.example.commonModelUtil.search
+package com.example.commonModelUtil.data
 
-import com.example.commonModelUtil.extension.convertDateString
 import com.google.gson.annotations.SerializedName
 
 data class ImageSearchResponseData(

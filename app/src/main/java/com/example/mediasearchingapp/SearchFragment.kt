@@ -5,34 +5,45 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.commonModelUtil.extension.getWindowWidth
 import com.example.commonModelUtil.extension.onEachState
-import com.example.commonModelUtil.search.SearchListData
+import com.example.commonModelUtil.data.SearchListData
+import com.example.commonModelUtil.extension.showToast
+import com.example.commonModelUtil.util.PreferenceUtil
 import com.example.mediasearchingapp.adapter.SearchAdapter
 import com.example.mediasearchingapp.base.BaseFragment
 import com.example.mediasearchingapp.databinding.FragmentSearchBinding
 import com.example.mediasearchingapp.viewmodel.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
-    override val enableBackPressed = true
+    @Inject
+    lateinit var preferenceUtil: PreferenceUtil
+    private val tag = SearchFragment::class.java.simpleName
+
+    override val enableBackPressed = false
     private val searchViewModel: SearchViewModel by viewModels()
     private val searchAdapter by lazy {
         SearchAdapter(requireContext(), onItemClicked)
     }
 
-    private val onItemClicked: (Boolean, SearchListData) -> Unit = { isFavorite, data ->
-        // todo: preference에 성공적으로 저장하면 뷰홀더에 버튼 채워진 하트로 변경하는 함수 호출
+    private val onItemClicked: (Boolean, SearchListData) -> Unit = { action, data ->
+        if (action) {
+            preferenceUtil.putFavoriteData(data)
+        } else {
+            preferenceUtil.deleteFavoriteData(data.thumbnail)
+        }
     }
 
     override fun createFragmentBinding(
@@ -47,10 +58,9 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
     override fun initFragment(savedInstanceState: Bundle?): Unit = with(binding) {
         addListener()
         collectViewModel()
-        with(rvSearch) {
-            val thumbnailWidth =
-                context.resources.getDimension(R.dimen.search_thumbnail_width).toInt()
-            val columnCnt = requireActivity().getWindowWidth() / thumbnailWidth
+        rvSearch.apply {
+            val thumbWidth = context.resources.getDimension(R.dimen.search_thumbnail_width).toInt()
+            val columnCnt = requireActivity().getWindowWidth() / thumbWidth
             layoutManager =
                 StaggeredGridLayoutManager(columnCnt, LinearLayoutManager.VERTICAL).apply {
                     gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
@@ -74,6 +84,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
         }
 
         rvSearch.addOnScrollListener(scrollListener)
+        rvSearch.itemAnimator = null
 
         btnTypeDelete.setOnClickListener {
             etSearch.text.clear()
@@ -85,13 +96,15 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
             success = {
                 if (isNewQuerySearch) {
                     searchAdapter.set(it)
+                    binding.rvSearch.scrollToPosition(0)
                     isNewQuerySearch = false
                 } else {
                     searchAdapter.addSearchList(it)
                 }
             },
             error = {
-                Log.i("아현", "searchResult : $this")
+                requireContext().showToast(com.example.commonModelUtil.R.string.error)
+                Log.e(tag, "searchResult error : $it")
             }
         ).launchIn(viewLifecycleOwner.lifecycleScope)
     }
@@ -102,5 +115,10 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
                 searchViewModel.search()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        searchAdapter.updateFavoriteBtn(searchViewModel.getFavoriteList())
     }
 }

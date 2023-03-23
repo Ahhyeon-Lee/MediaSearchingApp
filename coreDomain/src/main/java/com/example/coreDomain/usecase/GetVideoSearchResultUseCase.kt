@@ -1,6 +1,6 @@
 package com.example.coreDomain.usecase
 
-import com.example.commonModelUtil.search.SearchListData
+import com.example.commonModelUtil.data.SearchListData
 import com.example.coreNetwork.repository.SearchRepository
 import javax.inject.Inject
 
@@ -9,19 +9,20 @@ class GetVideoSearchResultUseCase @Inject constructor(
 ) {
     suspend fun invoke(
         query: String,
-        page: Int
+        page: Int,
+        favoriteList: List<SearchListData.VideoDocumentData>
     ): Pair<Boolean, List<SearchListData.VideoDocumentData>> =
         with(repository.getVideoSearchResult(query, page)) {
             Pair(
                 this.meta.isEnd,
                 this.documents.map {
                     SearchListData.VideoDocumentData(
-                        it.title,
-                        it.thumbnail,
-                        it.url,
-                        it.play_time,
-                        it.datetime,
-                        false
+                        title = it.title,
+                        thumbnail = it.thumbnail,
+                        videoUrl = it.url,
+                        playTime = it.play_time,
+                        datetime = it.datetime,
+                        isFavorite = it.thumbnail in favoriteList.map { it.thumbnail }
                     )
                 }
             )

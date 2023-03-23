@@ -4,43 +4,29 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
 import com.example.commonModelUtil.data.MediaType
-import com.example.commonModelUtil.extension.layoutInflater
 import com.example.commonModelUtil.data.SearchListData
-import com.example.mediasearchingapp.R
+import com.example.commonModelUtil.extension.layoutInflater
 import com.example.mediasearchingapp.base.BaseAdapter
 import com.example.mediasearchingapp.base.BaseViewHolder
-import com.example.mediasearchingapp.databinding.ItemSearchImageBinding
-import com.example.mediasearchingapp.databinding.ItemSearchVideoBinding
+import com.example.mediasearchingapp.databinding.ItemListImageBinding
+import com.example.mediasearchingapp.databinding.ItemListVideoBinding
 
-class SearchAdapter(
+class ListAdapter(
     private val context: Context,
     private val onClick: (Boolean, SearchListData) -> Unit
 ) : BaseAdapter<ViewDataBinding, SearchListData>() {
 
-    var recyclerView: RecyclerView? = null
+    fun updateList(items: List<SearchListData>) {
+        val diffUtilCallBack = DiffUtilCallback(adapterList, items)
+        val diffResult = DiffUtil.calculateDiff(diffUtilCallBack)
 
-    fun updateFavoriteBtn(favList: List<SearchListData>) {
-        adapterList.forEachIndexed { index, data ->
-            if (data.isFavorite && data !in favList) {
-                adapterList[index].isFavorite = false
-                (recyclerView?.findViewHolderForAdapterPosition(index) as? BaseMediaViewHolder<*, *>)?.run {
-                    updateFavoriteBtnView()
-                }
-            }
+        adapterList.run {
+            clear()
+            addAll(items)
+            diffResult.dispatchUpdatesTo(this@ListAdapter)
         }
-    }
-
-    fun addSearchList(list: List<SearchListData>) {
-        val startPosition = adapterList.lastIndex
-        adapterList.addAll(list)
-        notifyItemRangeInserted(startPosition, list.size)
-    }
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        this.recyclerView = recyclerView
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -54,12 +40,12 @@ class SearchAdapter(
         return when (viewType) {
             MediaType.IMAGE.ordinal -> {
                 ImageViewHolder(
-                    ItemSearchImageBinding.inflate(context.layoutInflater, parent, false)
+                    ItemListImageBinding.inflate(context.layoutInflater, parent, false)
                 )
             }
             else -> {
                 VideoViewHolder(
-                    ItemSearchVideoBinding.inflate(context.layoutInflater, parent, false)
+                    ItemListVideoBinding.inflate(context.layoutInflater, parent, false)
                 )
             }
         }
@@ -75,25 +61,18 @@ class SearchAdapter(
         }
 
         abstract fun initViewHolder()
-        open fun unselectFavorite() = Unit
 
         fun onItemClick(view: View) {
             view.isSelected = !data.isFavorite
             data.isFavorite = !data.isFavorite
             onClick.invoke(data.isFavorite, data)
         }
-
-        fun updateFavoriteBtnView() {
-            unselectFavorite()
-        }
     }
 
     inner class ImageViewHolder(
-        binding: ItemSearchImageBinding
-    ) : BaseMediaViewHolder<ItemSearchImageBinding, SearchListData.ImageDocumentData>(binding) {
+        binding: ItemListImageBinding
+    ) : BaseMediaViewHolder<ItemListImageBinding, SearchListData.ImageDocumentData>(binding) {
         override fun initViewHolder(): Unit = with(binding) {
-            val thumbWidth = context.resources.getDimension(R.dimen.search_thumbnail_width).toInt()
-            ivThumbnail.layoutParams.height = data.height * thumbWidth / data.width
             imageData = data
             btnFavorite.apply {
                 isSelected = data.isFavorite
@@ -103,15 +82,11 @@ class SearchAdapter(
                 requestLayout()
             }
         }
-
-        override fun unselectFavorite() = with(binding) {
-            btnFavorite.isSelected = false
-        }
     }
 
     inner class VideoViewHolder(
-        binding: ItemSearchVideoBinding
-    ) : BaseMediaViewHolder<ItemSearchVideoBinding, SearchListData.VideoDocumentData>(binding) {
+        binding: ItemListVideoBinding
+    ) : BaseMediaViewHolder<ItemListVideoBinding, SearchListData.VideoDocumentData>(binding) {
         override fun initViewHolder(): Unit = with(binding) {
             videoData = data
             btnFavorite.apply {
@@ -122,9 +97,25 @@ class SearchAdapter(
                 requestLayout()
             }
         }
+    }
 
-        override fun unselectFavorite() = with(binding) {
-            btnFavorite.isSelected = false
+    class DiffUtilCallback(
+        private val oldList: List<SearchListData>,
+        private val newList: List<SearchListData>
+    ) :
+        DiffUtil.Callback() {
+        override fun getOldListSize(): Int = oldList.size
+
+        override fun getNewListSize(): Int = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val oldItem = oldList[oldItemPosition]
+            val newItem = newList[newItemPosition]
+
+            return oldItem.thumbnail == newItem.thumbnail && oldItem.isFavorite == newItem.isFavorite
         }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+            oldList[oldItemPosition] == newList[newItemPosition]
     }
 }

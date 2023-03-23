@@ -1,7 +1,4 @@
-package com.example.commonModelUtil.search
-
-import com.example.commonModelUtil.extension.convertDateString
-import com.google.gson.annotations.SerializedName
+package com.example.commonModelUtil.data
 
 data class VideoSearchResponseData(
     val meta: MetaData,

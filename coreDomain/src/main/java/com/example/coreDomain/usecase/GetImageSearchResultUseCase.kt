@@ -1,6 +1,6 @@
 package com.example.coreDomain.usecase
 
-import com.example.commonModelUtil.search.SearchListData
+import com.example.commonModelUtil.data.SearchListData
 import com.example.coreNetwork.repository.SearchRepository
 import javax.inject.Inject
 
@@ -9,20 +9,21 @@ class GetImageSearchResultUseCase @Inject constructor(
 ) {
     suspend fun invoke(
         query: String,
-        page: Int
+        page: Int,
+        favoriteList: List<SearchListData.ImageDocumentData>
     ): Pair<Boolean, List<SearchListData.ImageDocumentData>> =
         with(repository.getImageSearchResult(query, page)) {
             Pair(
                 this.meta.isEnd,
                 this.documents.map {
                     SearchListData.ImageDocumentData(
-                        it.collection,
-                        it.thumbnail_url,
-                        it.image_url,
-                        it.width,
-                        it.height,
-                        it.datetime,
-                        false
+                        collection = it.collection,
+                        thumbnail = it.thumbnail_url,
+                        imageUrl = it.image_url,
+                        width = it.width,
+                        height = it.height,
+                        datetime = it.datetime,
+                        isFavorite = it.thumbnail_url in favoriteList.map { it.thumbnail }
                     )
                 }
             )
