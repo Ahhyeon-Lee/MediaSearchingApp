@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import com.example.commonModelUtil.data.SearchListData
 import com.example.commonModelUtil.extension.layoutInflater
@@ -14,7 +15,7 @@ import com.example.mediasearchingapp.databinding.ItemListVideoBinding
 
 class ListAdapter(
     private val context: Context,
-    private val onClick: (Boolean, SearchListData) -> Unit
+    private val onClick: (SearchListData) -> Unit
 ) : BaseAdapter<ViewDataBinding, SearchListData>() {
 
     companion object {
@@ -23,19 +24,16 @@ class ListAdapter(
         }
     }
 
-    fun updateList(items: List<SearchListData>) {
-        val diffUtilCallBack = DiffUtilCallback(adapterList, items)
-        val diffResult = DiffUtil.calculateDiff(diffUtilCallBack)
+    private val asyncDiffer = AsyncListDiffer(this, DiffUtilCallback())
 
-        adapterList.run {
-            clear()
-            addAll(items)
-            diffResult.dispatchUpdatesTo(this@ListAdapter)
-        }
+    fun updateList(items: List<SearchListData>) {
+        asyncDiffer.submitList(items)
     }
 
+    override fun getItemCount(): Int = asyncDiffer.currentList.size
+
     override fun getItemViewType(position: Int): Int {
-        return when (adapterList.getOrNull(position)) {
+        return when (asyncDiffer.currentList.getOrNull(position)) {
             is SearchListData.ImageDocumentData -> ListType.IMAGE.ordinal
             else -> ListType.VIDEO.ordinal
         }
@@ -61,7 +59,7 @@ class ListAdapter(
     ) : BaseViewHolder<ViewDataBinding>(binding) {
         lateinit var data: V
         override fun bind(position: Int) {
-            data = adapterList[position] as V
+            data = asyncDiffer.currentList[position] as V
             initViewHolder()
         }
 
@@ -69,8 +67,7 @@ class ListAdapter(
 
         fun onItemClick(view: View) {
             view.isSelected = !data.isFavorite
-            data.isFavorite = !data.isFavorite
-            onClick.invoke(data.isFavorite, data)
+            onClick.invoke(data)
         }
     }
 
@@ -102,22 +99,14 @@ class ListAdapter(
         }
     }
 
-    class DiffUtilCallback(
-        private val oldList: List<SearchListData>,
-        private val newList: List<SearchListData>
-    ) : DiffUtil.Callback() {
-        override fun getOldListSize(): Int = oldList.size
+    class DiffUtilCallback : DiffUtil.ItemCallback<SearchListData>() {
 
-        override fun getNewListSize(): Int = newList.size
-
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            val oldItem = oldList[oldItemPosition]
-            val newItem = newList[newItemPosition]
-
+        override fun areItemsTheSame(oldItem: SearchListData, newItem: SearchListData): Boolean {
             return oldItem.thumbnail == newItem.thumbnail && oldItem.isFavorite == newItem.isFavorite
         }
 
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
-            oldList[oldItemPosition] == newList[newItemPosition]
+        override fun areContentsTheSame(oldItem: SearchListData, newItem: SearchListData): Boolean {
+            return oldItem == newItem
+        }
     }
 }

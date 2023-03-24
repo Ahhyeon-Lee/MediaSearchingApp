@@ -28,10 +28,8 @@ class MyListFragment : BaseFragment<FragmentMyListBinding>() {
         ListAdapter(requireContext(), onItemClicked)
     }
 
-    private val onItemClicked: (Boolean, SearchListData) -> Unit = { action, data ->
-        if (!action) {
-            listViewModel.deleteFavoriteData(data)
-        }
+    private val onItemClicked: (SearchListData) -> Unit = { data ->
+        listViewModel.deleteFavoriteData(data)
     }
 
     override fun createFragmentBinding(
