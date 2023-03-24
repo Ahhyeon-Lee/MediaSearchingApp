@@ -42,7 +42,7 @@ class SearchAdapter(
     }
 
     fun addSearchList(list: List<SearchListData>) {
-        val startPosition = adapterList.lastIndex
+        val startPosition = adapterList.size
         adapterList.addAll(list)
         notifyItemRangeInserted(startPosition, list.size)
     }

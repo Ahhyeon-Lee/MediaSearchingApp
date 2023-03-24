@@ -42,52 +42,7 @@ fun <T> Flow<ResultState<T>>.onEachState(
     }
 }
 
-/** 로딩, 성공, 에러, 에러 with data, 완료 모두 동일한 처리를 할 때 사용
- * 예) 반환 데이터를 하나의 StateFlow에 대입해서 처리할 경우 */
-inline fun <T> Flow<ResultState<T>>.onState(
-    coroutineScope: CoroutineScope,
-    crossinline collect: (ResultState<T>) -> Unit
-) {
-    onEachState(
-        loading = { collect(ResultState.Loading) },
-        success = { collect(ResultState.Success(it)) },
-        error = { collect(ResultState.Error(it)) },
-        errorWithData = { collect(ResultState.ErrorWithData(it.first, it.second)) },
-        finish = { collect(ResultState.Finish) }
-    ).launchIn(coroutineScope)
-}
-
-inline fun <T, F> Flow<ResultState<T>>.onStateAppend(
-    coroutineScope: CoroutineScope,
-    arguments: F,
-    crossinline collect: (ResultState<Pair<T, F>>) -> Unit
-) {
-    onEachState(
-        loading = { collect(ResultState.Loading) },
-        success = { collect(ResultState.Success(Pair(it, arguments))) },
-        error = { collect(ResultState.Error(it)) },
-        finish = { collect(ResultState.Finish) }
-    ).launchIn(coroutineScope)
-}
-
-fun <T> Flow<T>.onError(callback: suspend (error: Throwable) -> Unit) = catch { error ->
-    error.printStackTrace()
-    callback(error)
-}
-
 inline fun <T> Flow<T>.collect(
     externalScope: CoroutineScope,
     crossinline collect: (T) -> Unit
 ) = onEach { collect.invoke(it) }.launchIn(externalScope)
-
-// 마지막 발행 시간과 현재 시간 비교해서 이벤트 발행, 나머지는 무시.
-fun <T> Flow<T>.throttleFirst(windowDuration: Long): Flow<T> = flow {
-    var lastEmissionTime = 0L
-    collect { upstream ->
-        val currentTime = System.currentTimeMillis()
-        if (currentTime - lastEmissionTime > windowDuration) {
-            lastEmissionTime = currentTime
-            emit(upstream)
-        }
-    }
-}

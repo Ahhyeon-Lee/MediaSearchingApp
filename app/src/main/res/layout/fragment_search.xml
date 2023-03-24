@@ -28,7 +28,9 @@
             android:inputType="text"
             android:paddingStart="20dp"
             android:paddingEnd="45dp"
+            android:textColor="@color/black"
             android:textColorHint="@color/gray"
+            android:textCursorDrawable="@drawable/bg_cursor"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton

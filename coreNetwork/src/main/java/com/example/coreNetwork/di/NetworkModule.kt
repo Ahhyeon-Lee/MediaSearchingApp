@@ -24,7 +24,7 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun getHeaderPhotoApiInterceptor() = Interceptor { chain ->
+    fun getHeaderInterceptor() = Interceptor { chain ->
         val builder = chain.request().newBuilder().apply {
             addHeader("Content-Type", "application/json;charset=UTF-8")
             addHeader("Authorization", "KakaoAK $apiKey")
@@ -34,13 +34,13 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun providesPhotoApiOkHttpClient(): OkHttpClient {
+    fun providesOkHttpClient(): OkHttpClient {
         val timeout = 2L
         val timeUnit = TimeUnit.MINUTES
 
         val okHttpClientBuilder = OkHttpClient.Builder()
             .addInterceptor(LoggingInterceptor())
-            .addInterceptor(getHeaderPhotoApiInterceptor())
+            .addInterceptor(getHeaderInterceptor())
             .connectTimeout(timeout, timeUnit)
             .writeTimeout(timeout, timeUnit)
             .readTimeout(timeout, timeUnit)
@@ -51,7 +51,7 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun providesPhotoRetrofitBuilder(
+    fun providesRetrofitBuilder(
         okHttpClient: OkHttpClient
     ): Retrofit.Builder =
         Retrofit.Builder()
