@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
-import com.example.commonModelUtil.data.MediaType
 import com.example.commonModelUtil.data.SearchListData
 import com.example.commonModelUtil.extension.layoutInflater
 import com.example.mediasearchingapp.base.BaseAdapter
@@ -17,6 +16,12 @@ class ListAdapter(
     private val context: Context,
     private val onClick: (Boolean, SearchListData) -> Unit
 ) : BaseAdapter<ViewDataBinding, SearchListData>() {
+
+    companion object {
+        enum class ListType {
+            IMAGE, VIDEO
+        }
+    }
 
     fun updateList(items: List<SearchListData>) {
         val diffUtilCallBack = DiffUtilCallback(adapterList, items)
@@ -31,14 +36,14 @@ class ListAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (adapterList.getOrNull(position)) {
-            is SearchListData.ImageDocumentData -> MediaType.IMAGE.ordinal
-            else -> MediaType.VIDEO.ordinal
+            is SearchListData.ImageDocumentData -> ListType.IMAGE.ordinal
+            else -> ListType.VIDEO.ordinal
         }
     }
 
     override fun getBinding(parent: ViewGroup, viewType: Int): BaseViewHolder<ViewDataBinding> {
         return when (viewType) {
-            MediaType.IMAGE.ordinal -> {
+            ListType.IMAGE.ordinal -> {
                 ImageViewHolder(
                     ItemListImageBinding.inflate(context.layoutInflater, parent, false)
                 )

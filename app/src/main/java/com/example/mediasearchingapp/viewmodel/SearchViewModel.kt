@@ -33,7 +33,9 @@ class SearchViewModel @Inject constructor(
     var isVideoSearchEnd = false
     var imageSearchPage = 1
     var videoSearchPage = 1
+    var totalPage = 1
     var isNewQuerySearch = false
+    var isCallFinished = true
 
     fun setTyping(state: Boolean) {
         _isTyping.value = state
@@ -47,21 +49,31 @@ class SearchViewModel @Inject constructor(
         currentQuery = query
         imageSearchPage = 1
         videoSearchPage = 1
+        totalPage = 1
         isNewQuerySearch = true
     }
 
     fun search() {
+        if (!isCallFinished) return
         getImageResult(currentQuery).zip(getVideoResult(currentQuery)) { imageResult, videoResult ->
             mutableListOf<SearchListData>().apply {
                 addAll(imageResult)
                 addAll(videoResult)
             }.sortedByDescending {
                 it.getDate()
+            }.toMutableList().apply {
+                if (isNotEmpty()) {
+                    add(0, SearchListData.PageData(totalPage++))
+                }
             }
+        }.onStart {
+            isCallFinished = false
         }.onEach {
             _searchResult.value = ResultState.Success(it)
         }.catch {
-            _searchResult.value = ResultState.Error()
+            _searchResult.value = ResultState.Error(it)
+        }.onCompletion {
+            isCallFinished = true
         }.launchIn(CoroutineScope(ioDispatcher))
     }
 

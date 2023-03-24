@@ -1,11 +1,11 @@
 package com.example.mediasearchingapp
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.commonModelUtil.extension.getWindowWidth
 import com.example.commonModelUtil.extension.onEachState
 import com.example.commonModelUtil.data.SearchListData
+import com.example.commonModelUtil.extension.getDimensionInt
 import com.example.commonModelUtil.extension.showToast
 import com.example.commonModelUtil.util.PreferenceUtil
 import com.example.mediasearchingapp.adapter.SearchAdapter
@@ -24,7 +25,6 @@ import com.example.mediasearchingapp.viewmodel.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
-
 @AndroidEntryPoint
 class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
@@ -34,14 +34,6 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
     override val enableBackPressed = false
     private val searchViewModel: SearchViewModel by viewModels()
-    private val staggeredGridLayoutManager by lazy {
-        val thumbWidth =
-            context?.resources?.getDimension(R.dimen.search_thumbnail_width)?.toInt() ?: 150.px
-        val columnCnt = requireActivity().getWindowWidth() / thumbWidth
-        StaggeredGridLayoutManager(columnCnt, LinearLayoutManager.VERTICAL).apply {
-            gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
-        }
-    }
     private val searchAdapter by lazy {
         SearchAdapter(requireContext(), onItemClicked)
     }
@@ -67,7 +59,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
         addListener()
         collectViewModel()
         rvSearch.apply {
-            layoutManager = staggeredGridLayoutManager
+            layoutManager = getStaggeredLayoutManager()
             itemAnimator = null
             adapter = searchAdapter
         }
@@ -127,15 +119,29 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
-            val positions = staggeredGridLayoutManager.findFirstVisibleItemPositions(
-                IntArray(staggeredGridLayoutManager.spanCount)
+            val layoutManager = recyclerView.layoutManager as StaggeredGridLayoutManager
+            val positions = layoutManager.findFirstVisibleItemPositions(
+                IntArray(layoutManager.spanCount)
             )
             searchViewModel.showBtnUp(positions[0] > 9)
+        }
+    }
+
+    private fun getStaggeredLayoutManager():StaggeredGridLayoutManager {
+        val thumbWidth = context?.getDimensionInt(R.dimen.search_thumbnail_width) ?: 150.px
+        val columnCnt = requireActivity().getWindowWidth() / thumbWidth
+        return StaggeredGridLayoutManager(columnCnt, LinearLayoutManager.VERTICAL).apply {
+            gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
         }
     }
 
     override fun onResume() {
         super.onResume()
         searchAdapter.updateFavoriteBtn(searchViewModel.getFavoriteList())
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        binding.rvSearch.layoutManager = getStaggeredLayoutManager()
     }
 }

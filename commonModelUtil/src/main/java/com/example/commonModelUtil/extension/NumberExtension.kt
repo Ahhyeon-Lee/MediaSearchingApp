@@ -14,9 +14,9 @@ fun Number.toDp(context: Context): Float {
 }
 
 fun Int.toTimeFormat(): String {
+    val hour = this / (60 * 60) % 24
+    val minute = (this / 60) % 60
     val second = this % 60
-    val minute = this / 60
-    val hour = this / 60 / 60
     return if (hour > 0) String.format("%02d : %02d : %02d", hour, minute, second)
     else String.format("%02d : %02d", minute, second)
 }

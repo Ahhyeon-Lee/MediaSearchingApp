@@ -1,12 +1,14 @@
 package com.example.mediasearchingapp
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.commonModelUtil.extension.getWindowWidth
 import com.example.commonModelUtil.data.SearchListData
+import com.example.commonModelUtil.extension.getDimensionInt
+import com.example.commonModelUtil.extension.getWindowWidth
 import com.example.commonModelUtil.util.PreferenceUtil
 import com.example.mediasearchingapp.adapter.ListAdapter
 import com.example.mediasearchingapp.base.BaseFragment
@@ -43,11 +45,8 @@ class MyListFragment : BaseFragment<FragmentMyListBinding>() {
     }
 
     private fun addListener() = with(binding) {
-        val thumbWidth =
-            context?.resources?.getDimension(R.dimen.list_thumbnail_width)?.toInt() ?: 100.px
-        val columnCnt = requireActivity().getWindowWidth() / thumbWidth
         rvList.apply {
-            layoutManager = GridLayoutManager(requireContext(), columnCnt)
+            layoutManager = getGridLayoutManager()
             adapter = listAdapter
         }
     }
@@ -58,9 +57,19 @@ class MyListFragment : BaseFragment<FragmentMyListBinding>() {
         }
     }
 
+    private fun getGridLayoutManager(): GridLayoutManager {
+        val thumbWidth = context?.getDimensionInt(R.dimen.list_thumbnail_width) ?: 100.px
+        val columnCnt = requireActivity().getWindowWidth() / thumbWidth
+        return GridLayoutManager(requireContext(), columnCnt)
+    }
+
     override fun onResume() {
         super.onResume()
         listViewModel.getFavoriteList()
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        binding.rvList.layoutManager = getGridLayoutManager()
+    }
 }

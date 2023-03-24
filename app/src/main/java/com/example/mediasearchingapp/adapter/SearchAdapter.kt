@@ -5,20 +5,28 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
-import com.example.commonModelUtil.data.MediaType
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.commonModelUtil.extension.layoutInflater
 import com.example.commonModelUtil.data.SearchListData
+import com.example.commonModelUtil.extension.getDimensionInt
 import com.example.commonModelUtil.extension.toPx
 import com.example.mediasearchingapp.R
 import com.example.mediasearchingapp.base.BaseAdapter
 import com.example.mediasearchingapp.base.BaseViewHolder
 import com.example.mediasearchingapp.databinding.ItemSearchImageBinding
+import com.example.mediasearchingapp.databinding.ItemSearchPageBinding
 import com.example.mediasearchingapp.databinding.ItemSearchVideoBinding
 
 class SearchAdapter(
     private val context: Context,
     private val onClick: (Boolean, SearchListData) -> Unit
 ) : BaseAdapter<ViewDataBinding, SearchListData>() {
+
+    companion object {
+        enum class SearchType {
+            IMAGE, VIDEO, PAGE
+        }
+    }
 
     var recyclerView: RecyclerView? = null
 
@@ -46,21 +54,27 @@ class SearchAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (adapterList.getOrNull(position)) {
-            is SearchListData.ImageDocumentData -> MediaType.IMAGE.ordinal
-            else -> MediaType.VIDEO.ordinal
+            is SearchListData.ImageDocumentData -> SearchType.IMAGE.ordinal
+            is SearchListData.VideoDocumentData -> SearchType.VIDEO.ordinal
+            else -> SearchType.PAGE.ordinal
         }
     }
 
     override fun getBinding(parent: ViewGroup, viewType: Int): BaseViewHolder<ViewDataBinding> {
         return when (viewType) {
-            MediaType.IMAGE.ordinal -> {
+            SearchType.IMAGE.ordinal -> {
                 ImageViewHolder(
                     ItemSearchImageBinding.inflate(context.layoutInflater, parent, false)
                 )
             }
-            else -> {
+            SearchType.VIDEO.ordinal -> {
                 VideoViewHolder(
                     ItemSearchVideoBinding.inflate(context.layoutInflater, parent, false)
+                )
+            }
+            else -> {
+                PageViewHolder(
+                    ItemSearchPageBinding.inflate(context.layoutInflater, parent, false)
                 )
             }
         }
@@ -93,8 +107,9 @@ class SearchAdapter(
         binding: ItemSearchImageBinding
     ) : BaseMediaViewHolder<ItemSearchImageBinding, SearchListData.ImageDocumentData>(binding) {
         override fun initViewHolder(): Unit = with(binding) {
-            val thumbWidth = context.resources.getDimension(R.dimen.search_thumbnail_width).toInt()
-            val height = (data.height * thumbWidth / data.width).takeIf { it <= 300.toPx(context) } ?: 300.toPx(context)
+            val thumbWidth = context.getDimensionInt(R.dimen.search_thumbnail_width)
+            val height = (data.height * thumbWidth / data.width).takeIf { it <= 300.toPx(context) }
+                ?: 300.toPx(context)
             ivThumbnail.layoutParams.height = height
             imageData = data
             btnFavorite.apply {
@@ -114,7 +129,7 @@ class SearchAdapter(
         binding: ItemSearchVideoBinding
     ) : BaseMediaViewHolder<ItemSearchVideoBinding, SearchListData.VideoDocumentData>(binding) {
         override fun initViewHolder(): Unit = with(binding) {
-            val thumbWidth = context.resources.getDimension(R.dimen.search_thumbnail_width).toInt()
+            val thumbWidth = context.getDimensionInt(R.dimen.search_thumbnail_width)
             val height = 78 * thumbWidth / 138
             ivThumbnail.layoutParams.height = height
             videoData = data
@@ -128,6 +143,21 @@ class SearchAdapter(
 
         override fun unselectFavorite() = with(binding) {
             btnFavorite.isSelected = false
+        }
+    }
+
+    inner class PageViewHolder(
+        binding: ItemSearchPageBinding
+    ) : BaseViewHolder<ItemSearchPageBinding>(binding) {
+
+        init {
+            val layoutParams = this.itemView.layoutParams as StaggeredGridLayoutManager.LayoutParams
+            layoutParams.isFullSpan = true
+        }
+
+        override fun bind(position: Int) {
+            val data = adapterList[position] as SearchListData.PageData
+            binding.tvPage.text = context.getString(R.string.text_page, data.page)
         }
     }
 }

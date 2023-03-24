@@ -21,6 +21,10 @@ sealed class SearchListData {
     fun getConvertedDate() = datetime.convertDateString()
     fun getDate() = datetime.getDate()
 
+    data class PageData(
+        val page: Int
+    ) : SearchListData()
+
     data class ImageDocumentData(
         val collection: String,
         override val thumbnail: String,
