@@ -33,7 +33,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:clipToOutline="true"
-                tools:src="@drawable/cat" />
+                tools:src="@drawable/ic_launcher_background" />
 
             <ImageButton
                 android:id="@+id/btnFavorite"

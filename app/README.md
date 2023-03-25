@@ -2,8 +2,6 @@
 
 ## 기능 구현
 
----
-
 ### 검색
 
 - 이미지와 동영상 api 호출 결과 각각을 flow 블록에서 방출하도록 해 zip으로 묶어 최신순 정렬
@@ -14,9 +12,9 @@
 
 - 검색 fragment에서 좋아요 추가/해제시 결과를 반영하기 위해 해당 fragment가 포커스 되었을 때 좋아요 리스트를 불러와 갱신
 
-## 구조 (CleanArchitecture)
-
 ---
+
+## 구조 (CleanArchitecture)
 
 - 구성 : UI(app module), Domain(coreDomain module), Data(coreNetwork module)
 - UI Layer
@@ -27,3 +25,8 @@
 - Data Layer
     - DataSource와 Repository, 네트워크 통신을 위한 클래스들을 가지고 있다.
     - 네트워크 통신을 위한 객체를 생성하며 통신 결과를 전달해주는 로직을 가지고 있다.
+
+---
+
+## 종속성 관리
+- Version Catalog와 Custom Plugin으로 공통 디펜던시 관리
