@@ -128,7 +128,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
         }
     }
 
-    private fun getStaggeredLayoutManager():StaggeredGridLayoutManager {
+    private fun getStaggeredLayoutManager(): StaggeredGridLayoutManager {
         val thumbWidth = context?.getDimensionInt(R.dimen.search_thumbnail_width) ?: 150.px
         val columnCnt = requireActivity().getWindowWidth() / thumbWidth
         return StaggeredGridLayoutManager(columnCnt, LinearLayoutManager.VERTICAL).apply {
@@ -143,6 +143,9 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        binding.rvSearch.layoutManager = getStaggeredLayoutManager()
+        if (newConfig.orientation != searchViewModel.prevOrientation) {
+            binding.rvSearch.layoutManager = getStaggeredLayoutManager()
+        }
+        searchViewModel.prevOrientation = newConfig.orientation
     }
 }

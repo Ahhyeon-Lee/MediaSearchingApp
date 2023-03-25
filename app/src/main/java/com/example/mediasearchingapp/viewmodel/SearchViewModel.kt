@@ -1,5 +1,6 @@
 package com.example.mediasearchingapp.viewmodel
 
+import android.content.res.Configuration
 import androidx.lifecycle.ViewModel
 import com.example.commonModelUtil.ResultState
 import com.example.commonModelUtil.mutableResultState
@@ -28,6 +29,7 @@ class SearchViewModel @Inject constructor(
     val isTyping = _isTyping.asStateFlow()
     private val _showBtnUp = MutableStateFlow<Boolean?>(null)
     val showBtnUp = _showBtnUp.asStateFlow()
+    var prevOrientation = Configuration.ORIENTATION_PORTRAIT
     var currentQuery = ""
     var isImageSearchEnd = false
     var isVideoSearchEnd = false
