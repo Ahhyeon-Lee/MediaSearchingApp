@@ -1,7 +1,6 @@
 package com.example.coreNetwork.di
 
 import com.example.coreNetwork.LoggingInterceptor
-import com.example.coreNetwork.adapter.FlowCallAdapterFactory
 import com.example.coreNetwork.service.SearchService
 import com.google.gson.Gson
 import dagger.Module
@@ -56,7 +55,6 @@ object NetworkModule {
     ): Retrofit.Builder =
         Retrofit.Builder()
             .client(okHttpClient)
-            .addCallAdapterFactory(FlowCallAdapterFactory())
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(Gson()))
 
