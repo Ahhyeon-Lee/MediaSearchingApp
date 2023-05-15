@@ -4,19 +4,17 @@ plugins {
 }
 
 android {
-    namespace = "com.example.coreDomain"
+    namespace = "com.example.coredatabase"
 }
 
 dependencies {
 
-    implementation(libs.bundles.android)
-    implementation(libs.bundles.androidx)
     implementation(libs.bundles.junit)
 
+    implementation(libs.bundles.room)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
+    kapt(libs.room.compiler)
 
-    implementation(project(":coreNetwork"))
-    implementation(project(":coreDataBase"))
     implementation(project(":commonModelUtil"))
 }

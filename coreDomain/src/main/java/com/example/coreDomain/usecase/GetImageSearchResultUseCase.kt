@@ -10,7 +10,7 @@ class GetImageSearchResultUseCase @Inject constructor(
     suspend fun invoke(
         query: String,
         page: Int,
-        favoriteList: List<SearchListData.ImageDocumentData>
+        favoriteList: List<SearchListData.ImageDocumentData> = listOf()
     ): Pair<Boolean, List<SearchListData.ImageDocumentData>> =
         with(repository.getImageSearchResult(query, page)) {
             Pair(

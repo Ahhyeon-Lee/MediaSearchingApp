@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.commonModelUtil.extension.layoutInflater
 import com.example.commonModelUtil.data.SearchListData
-import com.example.commonModelUtil.extension.getDimensionInt
+import com.example.commonModelUtil.extension.getDimenInt
 import com.example.commonModelUtil.extension.toPx
 import com.example.mediasearchingapp.R
 import com.example.mediasearchingapp.base.BaseAdapter
@@ -32,7 +32,7 @@ class SearchAdapter(
 
     fun updateFavoriteBtn(favList: List<SearchListData>) {
         adapterList.forEachIndexed { index, data ->
-            if (data.isFavorite && data !in favList) {
+            if (data.isFavorite && data.thumbnail !in favList.map { it.thumbnail }) {
                 adapterList[index].isFavorite = false
                 (recyclerView?.findViewHolderForAdapterPosition(index) as? BaseMediaViewHolder<*, *>)?.run {
                     updateFavoriteBtnView()
@@ -107,7 +107,7 @@ class SearchAdapter(
         binding: ItemSearchImageBinding
     ) : BaseMediaViewHolder<ItemSearchImageBinding, SearchListData.ImageDocumentData>(binding) {
         override fun initViewHolder(): Unit = with(binding) {
-            val thumbWidth = context.getDimensionInt(R.dimen.search_thumbnail_width)
+            val thumbWidth = context.getDimenInt(R.dimen.search_thumbnail_width)
             val height = (data.height * thumbWidth / data.width).takeIf { it <= 300.toPx(context) }
                 ?: 300.toPx(context)
             ivThumbnail.layoutParams.height = height
@@ -129,7 +129,7 @@ class SearchAdapter(
         binding: ItemSearchVideoBinding
     ) : BaseMediaViewHolder<ItemSearchVideoBinding, SearchListData.VideoDocumentData>(binding) {
         override fun initViewHolder(): Unit = with(binding) {
-            val thumbWidth = context.getDimensionInt(R.dimen.search_thumbnail_width)
+            val thumbWidth = context.getDimenInt(R.dimen.search_thumbnail_width)
             val height = 78 * thumbWidth / 138
             ivThumbnail.layoutParams.height = height
             videoData = data

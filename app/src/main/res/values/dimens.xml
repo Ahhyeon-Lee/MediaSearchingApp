@@ -2,4 +2,5 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="search_thumbnail_width">150dp</dimen>
     <dimen name="list_thumbnail_width">100dp</dimen>
+    <dimen name="list_thumbnail_margin_horizontal">20dp</dimen>
 </resources>

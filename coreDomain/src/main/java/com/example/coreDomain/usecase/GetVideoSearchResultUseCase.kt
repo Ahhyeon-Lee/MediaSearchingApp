@@ -2,6 +2,7 @@ package com.example.coreDomain.usecase
 
 import com.example.commonModelUtil.data.SearchListData
 import com.example.coreNetwork.repository.SearchRepository
+import com.example.coreNetwork.repository.SearchRepositoryImpl_Factory
 import javax.inject.Inject
 
 class GetVideoSearchResultUseCase @Inject constructor(
