@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.commonModelUtil.data.SearchListData
-import com.example.commonModelUtil.extension.getDimensionInt
+import com.example.commonModelUtil.extension.getDimenInt
 import com.example.commonModelUtil.extension.getWindowWidth
 import com.example.commonModelUtil.util.PreferenceUtil
 import com.example.mediasearchingapp.adapter.ListAdapter
@@ -56,7 +56,7 @@ class MyListFragment : BaseFragment<FragmentMyListBinding>() {
     }
 
     private fun getGridLayoutManager(): GridLayoutManager {
-        val thumbWidth = context?.getDimensionInt(R.dimen.list_thumbnail_width) ?: 100.px
+        val thumbWidth = requireContext().getDimenInt(R.dimen.list_thumbnail_width) + requireContext().getDimenInt(R.dimen.list_thumbnail_margin_horizontal)
         val columnCnt = requireActivity().getWindowWidth() / thumbWidth
         return GridLayoutManager(requireContext(), columnCnt)
     }

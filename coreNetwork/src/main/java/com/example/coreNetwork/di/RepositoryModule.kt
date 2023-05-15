@@ -11,5 +11,5 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
     @Binds
-    abstract fun bindsSearchRepository(searchRepository: SearchRepositoryImpl): SearchRepository
+    internal abstract fun bindsSearchRepository(searchRepository: SearchRepositoryImpl): SearchRepository
 }

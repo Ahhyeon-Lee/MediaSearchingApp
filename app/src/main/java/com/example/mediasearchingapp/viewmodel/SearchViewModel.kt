@@ -6,13 +6,13 @@ import com.example.commonModelUtil.ResultState
 import com.example.commonModelUtil.mutableResultState
 import com.example.commonModelUtil.data.SearchListData
 import com.example.commonModelUtil.util.PreferenceUtil
-import com.example.coreDomain.usecase.GetImageSearchResultUseCase
-import com.example.coreDomain.usecase.GetVideoSearchResultUseCase
+import com.example.coreDomain.usecase.*
 import com.example.mediasearchingapp.di.IoDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,6 +21,10 @@ class SearchViewModel @Inject constructor(
     private val preferenceUtil: PreferenceUtil,
     private val getImageSearchResultUseCase: GetImageSearchResultUseCase,
     private val getVideoSearchResultUseCase: GetVideoSearchResultUseCase,
+    private val getFavoriteImageListUseCase: GetFavoriteImageListUseCase,
+    private val getFavoriteVideoListUseCase: GetFavoriteVideoListUseCase,
+    private val putFavoriteImageUseCase: PutFavoriteImageDataUseCase,
+    private val putFavoriteVideoUseCase: PutFavoriteVideoDataUseCase
 ) : ViewModel() {
 
     private val _searchResult = mutableResultState<List<SearchListData>>()
@@ -53,6 +57,7 @@ class SearchViewModel @Inject constructor(
         videoSearchPage = 1
         totalPage = 1
         isNewQuerySearch = true
+        isImageSearchEnd = false
     }
 
     fun search() {
@@ -81,11 +86,9 @@ class SearchViewModel @Inject constructor(
 
     fun getFavoriteList() = preferenceUtil.getFavoriteList().toList()
 
-    private fun getFavoriteImageList() =
-        preferenceUtil.getFavoriteList().filterIsInstance<SearchListData.ImageDocumentData>()
+    private suspend fun getFavoriteImageList() = getFavoriteImageListUseCase()
 
-    private fun getFavoriteVideoList() =
-        preferenceUtil.getFavoriteList().filterIsInstance<SearchListData.VideoDocumentData>()
+    private suspend fun getFavoriteVideoList() = getFavoriteVideoListUseCase()
 
     private fun getImageResult(query: String) = flow {
         if (!isImageSearchEnd) {
@@ -118,6 +121,18 @@ class SearchViewModel @Inject constructor(
     }.onCompletion { error ->
         if (error == null) {
             videoSearchPage++
+        }
+    }
+
+    fun putFavoriteData(data: SearchListData) = CoroutineScope(ioDispatcher).launch {
+        when (data) {
+            is SearchListData.ImageDocumentData -> {
+                putFavoriteImageUseCase(data)
+            }
+            is SearchListData.VideoDocumentData -> {
+                putFavoriteVideoUseCase(data)
+            }
+            else -> {}
         }
     }
 }
