@@ -9,9 +9,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
-import com.example.commonModelUtil.extension.LifecycleOwnerWrapper
-import com.example.commonModelUtil.extension.toDp
-import com.example.commonModelUtil.extension.toPx
+import com.example.mediasearchingapp.extension.LifecycleOwnerWrapper
+import com.example.mediasearchingapp.extension.toDp
+import com.example.mediasearchingapp.extension.toPx
 
 abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), LifecycleOwnerWrapper {
 

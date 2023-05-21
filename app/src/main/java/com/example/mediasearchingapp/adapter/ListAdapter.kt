@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
-import com.example.commonModelUtil.data.SearchListData
-import com.example.commonModelUtil.extension.layoutInflater
+import com.example.coreDomain.data.SearchListData
+import com.example.mediasearchingapp.extension.layoutInflater
 import com.example.mediasearchingapp.base.BaseAdapter
 import com.example.mediasearchingapp.base.BaseViewHolder
 import com.example.mediasearchingapp.databinding.ItemListImageBinding

@@ -8,21 +8,18 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.example.commonModelUtil.data.SearchListData
-import com.example.commonModelUtil.extension.getDimenInt
-import com.example.commonModelUtil.extension.getWindowWidth
-import com.example.commonModelUtil.extension.onEachState
-import com.example.commonModelUtil.extension.showToast
+import com.example.coreDomain.data.SearchListData
 import com.example.mediasearchingapp.adapter.SearchAdapter
 import com.example.mediasearchingapp.base.BaseFragment
 import com.example.mediasearchingapp.databinding.FragmentSearchBinding
+import com.example.mediasearchingapp.extension.getDimenInt
+import com.example.mediasearchingapp.extension.getWindowWidth
+import com.example.mediasearchingapp.extension.showToast
 import com.example.mediasearchingapp.viewmodel.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.*
 
 @AndroidEntryPoint
 class SearchFragment : BaseFragment<FragmentSearchBinding>() {
@@ -90,7 +87,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
     }
 
     private fun collectViewModel() = with(searchViewModel) {
-        searchResult.onEachState(
+        searchResult.launchInUiState(
             success = {
                 if (isNewQuerySearch) {
                     searchAdapter.set(it)
@@ -101,12 +98,12 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
                 }
             },
             error = {
-                requireContext().showToast(com.example.commonModelUtil.R.string.error)
+                requireContext().showToast(R.string.error)
                 Log.e(tag, "searchResult error : $it")
             }
-        ).launchIn(viewLifecycleOwner.lifecycleScope)
+        )
 
-        favoriteResult.onResult {
+        favoriteResult.observe(viewLifecycleOwner) {
             searchAdapter.updateFavoriteBtn(it)
         }
     }

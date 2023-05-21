@@ -6,10 +6,10 @@ import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.example.commonModelUtil.extension.layoutInflater
-import com.example.commonModelUtil.data.SearchListData
-import com.example.commonModelUtil.extension.getDimenInt
-import com.example.commonModelUtil.extension.toPx
+import com.example.mediasearchingapp.extension.layoutInflater
+import com.example.coreDomain.data.SearchListData
+import com.example.mediasearchingapp.extension.getDimenInt
+import com.example.mediasearchingapp.extension.toPx
 import com.example.mediasearchingapp.R
 import com.example.mediasearchingapp.base.BaseAdapter
 import com.example.mediasearchingapp.base.BaseViewHolder

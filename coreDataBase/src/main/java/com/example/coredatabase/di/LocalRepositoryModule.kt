@@ -1,6 +1,6 @@
 package com.example.coredatabase.di
 
-import com.example.coredatabase.repository.FavoriteRepository
+import com.example.coreDomain.repository.FavoriteRepository
 import com.example.coredatabase.repository.FavoriteRepositoryImpl
 import dagger.Binds
 import dagger.Module

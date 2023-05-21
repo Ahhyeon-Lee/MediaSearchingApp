@@ -10,11 +10,10 @@ android {
 dependencies {
 
     implementation(libs.bundles.junit)
-
     implementation(libs.bundles.room)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
     kapt(libs.room.compiler)
 
-    implementation(project(":commonModelUtil"))
+    implementation(project(":coreDomain"))
 }

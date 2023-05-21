@@ -1,15 +1,12 @@
-package com.example.commonModelUtil.extension
+package com.example.mediasearchingapp.extension
 
-import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import com.example.commonModelUtil.ResultState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
 interface LifecycleOwnerWrapper {
 

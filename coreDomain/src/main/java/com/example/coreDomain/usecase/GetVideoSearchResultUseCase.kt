@@ -1,8 +1,8 @@
 package com.example.coreDomain.usecase
 
-import com.example.commonModelUtil.data.SearchListData
-import com.example.coreNetwork.repository.SearchRepository
-import com.example.coreNetwork.repository.SearchRepositoryImpl_Factory
+import com.example.coreDomain.data.SearchListData
+import com.example.coreDomain.data.VideoSearchResultData
+import com.example.coreDomain.repository.SearchRepository
 import javax.inject.Inject
 
 class GetVideoSearchResultUseCase @Inject constructor(
@@ -12,20 +12,11 @@ class GetVideoSearchResultUseCase @Inject constructor(
         query: String,
         page: Int,
         favoriteList: List<SearchListData.VideoDocumentData>
-    ): Pair<Boolean, List<SearchListData.VideoDocumentData>> =
-        with(repository.getVideoSearchResult(query, page)) {
-            Pair(
-                this.meta.isEnd,
-                this.documents.map {
-                    SearchListData.VideoDocumentData(
-                        title = it.title,
-                        thumbnail = it.thumbnail,
-                        videoUrl = it.url,
-                        playTime = it.play_time,
-                        datetime = it.datetime,
-                        isFavorite = it.thumbnail in favoriteList.map { it.thumbnail }
-                    )
-                }
-            )
+    ): VideoSearchResultData = repository.getVideoSearchResult(query, page).apply {
+        list.map { data ->
+            data.apply {
+                isFavorite = data.thumbnail in favoriteList.map { it.thumbnail }
+            }
         }
+    }
 }

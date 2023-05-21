@@ -6,7 +6,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.mediasearchingapp.MyListFragment
 import com.example.mediasearchingapp.SearchFragment
 
-class ScreenSlideAdapter(fa:FragmentActivity) : FragmentStateAdapter(fa) {
+class ScreenViewPagerAdapter(fa:FragmentActivity) : FragmentStateAdapter(fa) {
     override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment {

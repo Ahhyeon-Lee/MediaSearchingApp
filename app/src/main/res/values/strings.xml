@@ -7,4 +7,6 @@
 
     <string name="hint_search">검색어를 입력하세요.</string>
     <string name="text_page">Page %d</string>
+
+    <string name="error">다시 시도해주세요.</string>
 </resources>

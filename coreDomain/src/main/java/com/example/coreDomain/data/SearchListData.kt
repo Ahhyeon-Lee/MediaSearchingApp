@@ -1,8 +1,8 @@
-package com.example.commonModelUtil.data
+package com.example.coreDomain.data
 
-import com.example.commonModelUtil.extension.convertDateString
-import com.example.commonModelUtil.extension.getDate
-import com.example.commonModelUtil.extension.toTimeFormat
+import com.example.coreDomain.extension.convertDateString
+import com.example.coreDomain.extension.getDate
+import com.example.coreDomain.extension.toTimeFormat
 
 sealed class SearchListData {
 
@@ -34,7 +34,7 @@ sealed class SearchListData {
         val width: Int,
         val height: Int,
         override val datetime: String,
-        override var isFavorite: Boolean,
+        override var isFavorite: Boolean = false,
         override val type: String = "image",
         override var favoriteTime: Long = 0
     ) : SearchListData()
@@ -45,7 +45,7 @@ sealed class SearchListData {
         val videoUrl: String,
         val playTime: Int,
         override val datetime: String,
-        override var isFavorite: Boolean,
+        override var isFavorite: Boolean = false,
         override val type: String = "video",
         override var favoriteTime: Long = 0
     ) : SearchListData() {

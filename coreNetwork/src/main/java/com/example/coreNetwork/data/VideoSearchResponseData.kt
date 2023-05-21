@@ -1,4 +1,4 @@
-package com.example.commonModelUtil.data
+package com.example.coreNetwork.data
 
 data class VideoSearchResponseData(
     val meta: MetaData,

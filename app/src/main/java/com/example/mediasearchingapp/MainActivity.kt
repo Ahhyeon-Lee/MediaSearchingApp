@@ -2,7 +2,7 @@ package com.example.mediasearchingapp
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.mediasearchingapp.adapter.ScreenSlideAdapter
+import com.example.mediasearchingapp.adapter.ScreenViewPagerAdapter
 import com.example.mediasearchingapp.databinding.ActivityMainBinding
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.viewPager.adapter = ScreenSlideAdapter(this)
+        binding.viewPager.adapter = ScreenViewPagerAdapter(this)
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             if (position == 0) {
                 tab.text = getString(R.string.tab_text_search)

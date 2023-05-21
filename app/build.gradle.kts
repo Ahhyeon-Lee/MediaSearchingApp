@@ -33,14 +33,14 @@ android {
 
 dependencies {
 
+    implementation(libs.bundles.junit)
     implementation(libs.bundles.android)
     implementation(libs.bundles.androidx)
-    implementation(libs.bundles.junit)
     implementation(libs.glide)
-
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
 
+    implementation(project(":coreDataBase"))
+    implementation(project(":coreNetwork"))
     implementation(project(":coreDomain"))
-    implementation(project(":commonModelUtil"))
 }

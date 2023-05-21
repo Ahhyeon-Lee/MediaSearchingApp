@@ -1,4 +1,4 @@
-package com.example.commonModelUtil.extension
+package com.example.mediasearchingapp.extension
 
 import android.os.Build
 import android.util.DisplayMetrics

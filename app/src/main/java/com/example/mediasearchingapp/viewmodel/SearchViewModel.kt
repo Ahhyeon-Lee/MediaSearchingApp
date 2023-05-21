@@ -1,12 +1,14 @@
 package com.example.mediasearchingapp.viewmodel
 
 import android.content.res.Configuration
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.commonModelUtil.ResultState
-import com.example.commonModelUtil.data.SearchListData
-import com.example.commonModelUtil.mutableResultState
+import com.example.coreDomain.data.SearchListData
 import com.example.coreDomain.usecase.*
 import com.example.mediasearchingapp.di.IoDispatcher
+import com.example.mediasearchingapp.extension.ResultState
+import com.example.mediasearchingapp.extension.mutableResultState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -30,8 +32,8 @@ class SearchViewModel @Inject constructor(
 
     private val _searchResult = mutableResultState<List<SearchListData>>()
     val searchResult = _searchResult.asStateFlow()
-    private val _favoriteResult = MutableStateFlow<List<SearchListData>>(listOf())
-    val favoriteResult = _favoriteResult.asStateFlow()
+    private val _favoriteResult = MutableLiveData<List<SearchListData>>(listOf())
+    val favoriteResult = _favoriteResult as LiveData<List<SearchListData>>
     private val _isTyping = MutableStateFlow(false)
     val isTyping = _isTyping.asStateFlow()
     private val _showBtnUp = MutableStateFlow<Boolean?>(null)
@@ -84,12 +86,10 @@ class SearchViewModel @Inject constructor(
         }.launchIn(CoroutineScope(ioDispatcher))
     }
 
-    fun getFavoriteList() {
-        CoroutineScope(ioDispatcher).launch {
-            val favImageList = async { getFavoriteImageListOnceUseCase() }
-            val favVideoList = async { getFavoriteVideoListOnceUseCase() }
-            _favoriteResult.value = favImageList.await() + favVideoList.await()
-        }
+    fun getFavoriteList() = CoroutineScope(ioDispatcher).launch {
+        val favImageList = async { getFavoriteImageListOnceUseCase() }
+        val favVideoList = async { getFavoriteVideoListOnceUseCase() }
+        _favoriteResult.postValue(favImageList.await() + favVideoList.await())
     }
 
     private fun getImageResult(query: String) = flow {
@@ -99,8 +99,8 @@ class SearchViewModel @Inject constructor(
                 imageSearchPage,
                 getFavoriteImageListOnceUseCase()
             )
-            isImageSearchEnd = result.first
-            emit(result.second)
+            isImageSearchEnd = result.isEnd
+            emit(result.list)
         } else {
             emit(emptyList())
         }
@@ -119,8 +119,8 @@ class SearchViewModel @Inject constructor(
                 videoSearchPage,
                 getFavoriteVideoListOnceUseCase()
             )
-            isVideoSearchEnd = result.first
-            emit(result.second)
+            isVideoSearchEnd = result.isEnd
+            emit(result.list)
         } else {
             emit(emptyList())
         }

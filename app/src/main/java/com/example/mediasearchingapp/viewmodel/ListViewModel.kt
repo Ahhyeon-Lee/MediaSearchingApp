@@ -1,15 +1,20 @@
 package com.example.mediasearchingapp.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.commonModelUtil.ResultState
-import com.example.commonModelUtil.data.SearchListData
-import com.example.commonModelUtil.mutableResultState
-import com.example.coreDomain.usecase.*
+import com.example.coreDomain.data.SearchListData
+import com.example.coreDomain.usecase.DeleteFavoriteImageDataUseCase
+import com.example.coreDomain.usecase.DeleteFavoriteVideoDataUseCase
+import com.example.coreDomain.usecase.GetFavoriteListFlowUseCase
 import com.example.mediasearchingapp.di.IoDispatcher
+import com.example.mediasearchingapp.extension.ResultState
+import com.example.mediasearchingapp.extension.mutableResultState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

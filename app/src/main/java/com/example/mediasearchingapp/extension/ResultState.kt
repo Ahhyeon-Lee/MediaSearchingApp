@@ -1,4 +1,4 @@
-package com.example.commonModelUtil
+package com.example.mediasearchingapp.extension
 
 import kotlinx.coroutines.flow.*
 

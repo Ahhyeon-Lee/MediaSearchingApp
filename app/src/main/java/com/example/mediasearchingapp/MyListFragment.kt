@@ -5,19 +5,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.commonModelUtil.data.SearchListData
-import com.example.commonModelUtil.extension.getDimenInt
-import com.example.commonModelUtil.extension.getWindowWidth
-import com.example.commonModelUtil.extension.onEachState
-import com.example.commonModelUtil.extension.showToast
+import com.example.coreDomain.data.SearchListData
 import com.example.mediasearchingapp.adapter.ListAdapter
 import com.example.mediasearchingapp.base.BaseFragment
 import com.example.mediasearchingapp.databinding.FragmentMyListBinding
+import com.example.mediasearchingapp.extension.getDimenInt
+import com.example.mediasearchingapp.extension.getWindowWidth
+import com.example.mediasearchingapp.extension.showToast
 import com.example.mediasearchingapp.viewmodel.ListViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.launchIn
 
 @AndroidEntryPoint
 class MyListFragment : BaseFragment<FragmentMyListBinding>() {
@@ -50,10 +47,10 @@ class MyListFragment : BaseFragment<FragmentMyListBinding>() {
     }
 
     private fun collectViewModel() = with(listViewModel) {
-        favoriteListData.onEachState(
+        favoriteListData.launchInUiState(
             success = { listAdapter.updateList(it) },
-            error = { requireContext().showToast(com.example.commonModelUtil.R.string.error) }
-        ).launchIn(viewLifecycleOwner.lifecycleScope)
+            error = { requireContext().showToast(R.string.error) }
+        )
     }
 
     private fun getGridLayoutManager(): GridLayoutManager {

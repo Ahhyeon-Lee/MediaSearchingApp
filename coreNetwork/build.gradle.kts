@@ -9,11 +9,10 @@ android {
 
 dependencies {
 
-    implementation(libs.bundles.network)
     implementation(libs.bundles.junit)
-
+    implementation(libs.bundles.network)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
 
-    implementation(project(":commonModelUtil"))
+    implementation(project(":coreDomain"))
 }

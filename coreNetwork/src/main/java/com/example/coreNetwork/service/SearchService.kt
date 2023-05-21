@@ -1,7 +1,7 @@
 package com.example.coreNetwork.service
 
-import com.example.commonModelUtil.data.ImageSearchResponseData
-import com.example.commonModelUtil.data.VideoSearchResponseData
+import com.example.coreNetwork.data.ImageSearchResponseData
+import com.example.coreNetwork.data.VideoSearchResponseData
 import retrofit2.http.GET
 import retrofit2.http.Query
 

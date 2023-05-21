@@ -1,6 +1,5 @@
-package com.example.commonModelUtil.extension
+package com.example.mediasearchingapp.extension
 
-import com.example.commonModelUtil.ResultState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 

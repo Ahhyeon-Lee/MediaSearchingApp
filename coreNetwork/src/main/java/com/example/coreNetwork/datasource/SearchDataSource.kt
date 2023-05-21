@@ -1,7 +1,7 @@
 package com.example.coreNetwork.datasource
 
-import com.example.commonModelUtil.data.ImageSearchResponseData
-import com.example.commonModelUtil.data.VideoSearchResponseData
+import com.example.coreNetwork.data.ImageSearchResponseData
+import com.example.coreNetwork.data.VideoSearchResponseData
 
 interface SearchDataSource {
     suspend fun getImageSearchResult(query: String, page: Int): ImageSearchResponseData

@@ -1,4 +1,4 @@
-package com.example.commonModelUtil.extension
+package com.example.mediasearchingapp.extension
 
 import android.content.Context
 import android.widget.Toast
