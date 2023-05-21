@@ -12,19 +12,17 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.example.commonModelUtil.extension.getWindowWidth
-import com.example.commonModelUtil.extension.onEachState
 import com.example.commonModelUtil.data.SearchListData
 import com.example.commonModelUtil.extension.getDimenInt
+import com.example.commonModelUtil.extension.getWindowWidth
+import com.example.commonModelUtil.extension.onEachState
 import com.example.commonModelUtil.extension.showToast
-import com.example.commonModelUtil.util.PreferenceUtil
 import com.example.mediasearchingapp.adapter.SearchAdapter
 import com.example.mediasearchingapp.base.BaseFragment
 import com.example.mediasearchingapp.databinding.FragmentSearchBinding
 import com.example.mediasearchingapp.viewmodel.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.*
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SearchFragment : BaseFragment<FragmentSearchBinding>() {

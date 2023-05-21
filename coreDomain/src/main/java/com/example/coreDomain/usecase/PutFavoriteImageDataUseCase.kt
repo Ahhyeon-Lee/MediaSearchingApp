@@ -11,8 +11,8 @@ class PutFavoriteImageDataUseCase @Inject constructor(
     suspend fun invoke(data: SearchListData.ImageDocumentData) {
         favoriteRepository.putFavoriteImageData(
             ImageDocumentEntity(
-                collection = data.collection,
                 thumbnail = data.thumbnail,
+                collection = data.collection,
                 imageUrl = data.imageUrl,
                 width = data.width,
                 height = data.height,

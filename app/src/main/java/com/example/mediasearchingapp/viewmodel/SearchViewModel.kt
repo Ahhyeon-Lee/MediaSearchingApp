@@ -86,20 +86,19 @@ class SearchViewModel @Inject constructor(
 
     fun getFavoriteList() {
         CoroutineScope(ioDispatcher).launch {
-            val favImageList = async { getFavoriteImageList() }
-            val favVideoList = async { getFavoriteVideoList() }
+            val favImageList = async { getFavoriteImageListOnceUseCase() }
+            val favVideoList = async { getFavoriteVideoListOnceUseCase() }
             _favoriteResult.value = favImageList.await() + favVideoList.await()
         }
     }
 
-    private suspend fun getFavoriteImageList() = getFavoriteImageListOnceUseCase()
-
-    private suspend fun getFavoriteVideoList() = getFavoriteVideoListOnceUseCase()
-
     private fun getImageResult(query: String) = flow {
         if (!isImageSearchEnd) {
-            val result =
-                getImageSearchResultUseCase.invoke(query, imageSearchPage, getFavoriteImageList())
+            val result = getImageSearchResultUseCase.invoke(
+                query,
+                imageSearchPage,
+                getFavoriteImageListOnceUseCase()
+            )
             isImageSearchEnd = result.first
             emit(result.second)
         } else {
@@ -115,8 +114,11 @@ class SearchViewModel @Inject constructor(
 
     private fun getVideoResult(query: String) = flow {
         if (!isVideoSearchEnd) {
-            val result =
-                getVideoSearchResultUseCase.invoke(query, videoSearchPage, getFavoriteVideoList())
+            val result = getVideoSearchResultUseCase.invoke(
+                query,
+                videoSearchPage,
+                getFavoriteVideoListOnceUseCase()
+            )
             isVideoSearchEnd = result.first
             emit(result.second)
         } else {

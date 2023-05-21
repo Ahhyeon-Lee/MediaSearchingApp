@@ -7,8 +7,8 @@ import androidx.room.PrimaryKey
 @Entity
 data class ImageDocumentEntity(
     @PrimaryKey
-    @ColumnInfo(name = "favoriteTime") val favoriteTime: Long = 0,
     @ColumnInfo(name = "thumbnail") val thumbnail: String,
+    @ColumnInfo(name = "favoriteTime") val favoriteTime: Long = 0,
     @ColumnInfo(name = "collection") val collection: String,
     @ColumnInfo(name = "imageUrl") val imageUrl: String,
     @ColumnInfo(name = "width") val width: Int,
