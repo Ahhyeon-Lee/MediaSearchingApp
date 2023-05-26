@@ -6,12 +6,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.coreDomain.data.SearchListData
 import com.example.coreDomain.usecase.*
+import com.example.mediasearchingapp.di.DefaultDispatcher
 import com.example.mediasearchingapp.di.IoDispatcher
 import com.example.mediasearchingapp.extension.ResultState
 import com.example.mediasearchingapp.extension.mutableResultState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -20,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val getImageSearchResultUseCase: GetImageSearchResultUseCase,
     private val getVideoSearchResultUseCase: GetVideoSearchResultUseCase,
     private val getFavoriteImageListOnceUseCase: GetFavoriteImageListOnceUseCase,
@@ -47,6 +50,7 @@ class SearchViewModel @Inject constructor(
     var totalPage = 1
     var isNewQuerySearch = false
     var isCallFinished = true
+    var searchingJob: Job? = null
 
     fun setTyping(state: Boolean) {
         _isTyping.value = state
@@ -66,24 +70,26 @@ class SearchViewModel @Inject constructor(
     }
 
     fun search() {
-        if (!isCallFinished) return
-        getImageResult(currentQuery).zip(getVideoResult(currentQuery)) { imageResult, videoResult ->
-            (imageResult + videoResult).sortedByDescending {
-                it.getDate()
-            }.toMutableList().apply {
-                if (isNotEmpty()) {
-                    add(0, SearchListData.PageData(totalPage++))
+        if (searchingJob?.isActive == true) searchingJob?.cancel()
+        searchingJob = CoroutineScope(defaultDispatcher).launch {
+            getImageResult(currentQuery).zip(getVideoResult(currentQuery)) { imageResult, videoResult ->
+                (imageResult + videoResult).sortedByDescending {
+                    it.getDate()
+                }.toMutableList().apply {
+                    if (isNotEmpty()) {
+                        add(0, SearchListData.PageData(totalPage++))
+                    }
                 }
-            }
-        }.onStart {
-            isCallFinished = false
-        }.onEach {
-            _searchResult.value = ResultState.Success(it)
-        }.catch {
-            _searchResult.value = ResultState.Error(it)
-        }.onCompletion {
-            isCallFinished = true
-        }.launchIn(CoroutineScope(ioDispatcher))
+            }.onStart {
+                isCallFinished = false
+            }.onEach {
+                _searchResult.value = ResultState.Success(it)
+            }.catch {
+                _searchResult.value = ResultState.Error(it)
+            }.onCompletion {
+                isCallFinished = true
+            }.launchIn(this)
+        }
     }
 
     fun getFavoriteList() = CoroutineScope(ioDispatcher).launch {
