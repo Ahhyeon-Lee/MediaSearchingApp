@@ -35,6 +35,8 @@ class SearchViewModel @Inject constructor(
 
     private val _searchResult = mutableResultState<List<SearchListData>>()
     val searchResult = _searchResult.asStateFlow()
+    private val _isResultEmpty = MutableLiveData<Boolean?>(null)
+    val isResultEmpty = _isResultEmpty as LiveData<Boolean?>
     private val _favoriteResult = MutableLiveData<List<SearchListData>>(listOf())
     val favoriteResult = _favoriteResult as LiveData<List<SearchListData>>
     private val _isTyping = MutableStateFlow(false)
@@ -84,6 +86,7 @@ class SearchViewModel @Inject constructor(
                 isCallFinished = false
             }.onEach {
                 _searchResult.value = ResultState.Success(it)
+                if (it.isEmpty()) _isResultEmpty.postValue(true)
             }.catch {
                 _searchResult.value = ResultState.Error(it)
             }.onCompletion {

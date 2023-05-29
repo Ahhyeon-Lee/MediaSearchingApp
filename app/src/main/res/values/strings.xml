@@ -9,4 +9,5 @@
     <string name="text_page">Page %d</string>
 
     <string name="error">다시 시도해주세요.</string>
+    <string name="nothing">\'%s\'의 검색 결과가 없습니다.</string>
 </resources>

@@ -92,6 +92,8 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
     private fun collectViewModel() = with(searchViewModel) {
         searchResult.launchInUiState(
             success = {
+                if (it.isEmpty()) return@launchInUiState
+
                 if (isNewQuerySearch) {
                     searchAdapter.set(it)
                     binding.rvSearch.scrollToPosition(0)
@@ -105,6 +107,13 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
                 Log.e(tag, "searchResult error : $it")
             }
         )
+
+        isResultEmpty.observe(viewLifecycleOwner) { isEmpty ->
+            if (isEmpty == true) {
+                val msg = getString(R.string.nothing, currentQuery)
+                requireContext().showToast(msg)
+            }
+        }
 
         favoriteResult.observe(viewLifecycleOwner) {
             searchAdapter.updateFavoriteBtn(it)
