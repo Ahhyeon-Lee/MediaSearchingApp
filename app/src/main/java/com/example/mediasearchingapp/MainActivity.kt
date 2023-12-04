@@ -2,6 +2,7 @@ package com.example.mediasearchingapp
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
 import com.example.mediasearchingapp.adapter.ScreenSlideAdapter
 import com.example.mediasearchingapp.databinding.ActivityMainBinding
 import com.google.android.material.tabs.TabLayoutMediator
@@ -17,7 +18,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.viewPager.adapter = ScreenSlideAdapter(this)
+        binding.viewPager.apply {
+            adapter = ScreenSlideAdapter(this@MainActivity)
+            getChildAt(0).overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+        }
+
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             if (position == 0) {
                 tab.text = getString(R.string.tab_text_search)

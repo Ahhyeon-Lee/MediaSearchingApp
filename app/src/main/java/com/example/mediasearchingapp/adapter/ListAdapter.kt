@@ -1,20 +1,16 @@
 package com.example.mediasearchingapp.adapter
 
-import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.DiffUtil
-import com.example.commonModelUtil.data.SearchListData
-import com.example.commonModelUtil.extension.layoutInflater
+import com.example.coreDomain.data.SearchListData
 import com.example.mediasearchingapp.base.BaseAdapter
 import com.example.mediasearchingapp.base.BaseViewHolder
 import com.example.mediasearchingapp.databinding.ItemListImageBinding
 import com.example.mediasearchingapp.databinding.ItemListVideoBinding
+import com.example.mediasearchingapp.extension.layoutInflater
 
 class ListAdapter(
-    private val context: Context,
     private val onClick: (SearchListData) -> Unit
 ) : BaseAdapter<ViewDataBinding, SearchListData>() {
 
@@ -24,31 +20,31 @@ class ListAdapter(
         }
     }
 
-    private val asyncDiffer = AsyncListDiffer(this, DiffUtilCallback())
-
-    fun updateList(items: List<SearchListData>) {
-        asyncDiffer.submitList(items)
-    }
-
-    override fun getItemCount(): Int = asyncDiffer.currentList.size
-
     override fun getItemViewType(position: Int): Int {
-        return when (asyncDiffer.currentList.getOrNull(position)) {
+        return when (adapterList.getOrNull(position)) {
             is SearchListData.ImageDocumentData -> ListType.IMAGE.ordinal
             else -> ListType.VIDEO.ordinal
         }
+    }
+
+    override fun areItemsSame(oldItem: SearchListData, newItem: SearchListData): Boolean {
+        return oldItem.thumbnail == newItem.thumbnail
+    }
+
+    override fun areContentsSame(oldItem: SearchListData, newItem: SearchListData): Boolean {
+        return oldItem == newItem
     }
 
     override fun getBinding(parent: ViewGroup, viewType: Int): BaseViewHolder<ViewDataBinding> {
         return when (viewType) {
             ListType.IMAGE.ordinal -> {
                 ImageViewHolder(
-                    ItemListImageBinding.inflate(context.layoutInflater, parent, false)
+                    ItemListImageBinding.inflate(parent.context.layoutInflater, parent, false)
                 )
             }
             else -> {
                 VideoViewHolder(
-                    ItemListVideoBinding.inflate(context.layoutInflater, parent, false)
+                    ItemListVideoBinding.inflate(parent.context.layoutInflater, parent, false)
                 )
             }
         }
@@ -59,7 +55,7 @@ class ListAdapter(
     ) : BaseViewHolder<ViewDataBinding>(binding) {
         lateinit var data: V
         override fun bind(position: Int) {
-            data = asyncDiffer.currentList[position] as V
+            data = adapterList[position] as V
             initViewHolder()
         }
 
@@ -74,39 +70,36 @@ class ListAdapter(
     inner class ImageViewHolder(
         binding: ItemListImageBinding
     ) : BaseMediaViewHolder<ItemListImageBinding, SearchListData.ImageDocumentData>(binding) {
+
+        init {
+            binding.btnFavorite.setOnClickListener {
+                val data = adapterList[absoluteAdapterPosition]
+                it.isSelected = !data.isFavorite
+                onClick.invoke(data)
+            }
+        }
+
         override fun initViewHolder(): Unit = with(binding) {
             imageData = data
-            btnFavorite.apply {
-                isSelected = data.isFavorite
-                setOnClickListener {
-                    onItemClick(it)
-                }
-            }
+            btnFavorite.isSelected = data.isFavorite
         }
     }
 
     inner class VideoViewHolder(
         binding: ItemListVideoBinding
     ) : BaseMediaViewHolder<ItemListVideoBinding, SearchListData.VideoDocumentData>(binding) {
-        override fun initViewHolder(): Unit = with(binding) {
-            videoData = data
-            btnFavorite.apply {
-                isSelected = data.isFavorite
-                setOnClickListener {
-                    onItemClick(it)
-                }
+
+        init {
+            binding.btnFavorite.setOnClickListener {
+                val data = adapterList[absoluteAdapterPosition]
+                it.isSelected = !data.isFavorite
+                onClick.invoke(data)
             }
         }
-    }
 
-    class DiffUtilCallback : DiffUtil.ItemCallback<SearchListData>() {
-
-        override fun areItemsTheSame(oldItem: SearchListData, newItem: SearchListData): Boolean {
-            return oldItem.thumbnail == newItem.thumbnail && oldItem.isFavorite == newItem.isFavorite
-        }
-
-        override fun areContentsTheSame(oldItem: SearchListData, newItem: SearchListData): Boolean {
-            return oldItem == newItem
+        override fun initViewHolder(): Unit = with(binding) {
+            videoData = data
+            btnFavorite.isSelected = data.isFavorite
         }
     }
 }

@@ -7,7 +7,7 @@
 
         <variable
             name="videoData"
-            type="com.example.commonModelUtil.data.SearchListData.VideoDocumentData" />
+            type="com.example.coreDomain.data.SearchListData.VideoDocumentData" />
     </data>
 
     <LinearLayout

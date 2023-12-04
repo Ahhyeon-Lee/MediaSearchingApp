@@ -1,6 +1,6 @@
 package com.example.coreNetwork.di
 
-import com.example.coreNetwork.repository.SearchRepository
+import com.example.coreDomain.repository.SearchRepository
 import com.example.coreNetwork.repository.SearchRepositoryImpl
 import dagger.Binds
 import dagger.Module

@@ -1,55 +1,33 @@
 package com.example.mediasearchingapp.adapter
 
-import android.content.Context
-import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.example.commonModelUtil.extension.layoutInflater
-import com.example.commonModelUtil.data.SearchListData
-import com.example.commonModelUtil.extension.getDimensionInt
-import com.example.commonModelUtil.extension.toPx
+import com.example.coreDomain.data.SearchListData
 import com.example.mediasearchingapp.R
 import com.example.mediasearchingapp.base.BaseAdapter
 import com.example.mediasearchingapp.base.BaseViewHolder
+import com.example.mediasearchingapp.data.UpdateFavoriteActionType
 import com.example.mediasearchingapp.databinding.ItemSearchImageBinding
 import com.example.mediasearchingapp.databinding.ItemSearchPageBinding
 import com.example.mediasearchingapp.databinding.ItemSearchVideoBinding
+import com.example.mediasearchingapp.extension.getDimensionInt
+import com.example.mediasearchingapp.extension.layoutInflater
+import com.example.mediasearchingapp.extension.setImage
+import com.example.mediasearchingapp.extension.toPx
 
 class SearchAdapter(
-    private val context: Context,
-    private val onClick: (Boolean, SearchListData) -> Unit
+    private val onClick: (UpdateFavoriteActionType, SearchListData) -> Unit
 ) : BaseAdapter<ViewDataBinding, SearchListData>() {
 
     companion object {
         enum class SearchType {
             IMAGE, VIDEO, PAGE
         }
-    }
 
-    var recyclerView: RecyclerView? = null
-
-    fun updateFavoriteBtn(favList: List<SearchListData>) {
-        adapterList.forEachIndexed { index, data ->
-            if (data.isFavorite && data !in favList) {
-                adapterList[index].isFavorite = false
-                (recyclerView?.findViewHolderForAdapterPosition(index) as? BaseMediaViewHolder<*, *>)?.run {
-                    updateFavoriteBtnView()
-                }
-            }
+        enum class SearchPayLoadType {
+            FAVORITE
         }
-    }
-
-    fun addSearchList(list: List<SearchListData>) {
-        val startPosition = adapterList.size
-        adapterList.addAll(list)
-        notifyItemRangeInserted(startPosition, list.size)
-    }
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        this.recyclerView = recyclerView
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -60,23 +38,55 @@ class SearchAdapter(
         }
     }
 
+    override fun areItemsSame(oldItem: SearchListData, newItem: SearchListData): Boolean {
+        return oldItem.thumbnail == newItem.thumbnail
+    }
+
+    override fun areContentsSame(oldItem: SearchListData, newItem: SearchListData): Boolean {
+        return oldItem == newItem
+    }
+
+    override fun getChangeItemPayload(oldItem: SearchListData, newItem: SearchListData): Any? {
+        return if (oldItem.isFavorite != newItem.isFavorite) SearchPayLoadType.FAVORITE
+        else null
+    }
+
     override fun getBinding(parent: ViewGroup, viewType: Int): BaseViewHolder<ViewDataBinding> {
         return when (viewType) {
             SearchType.IMAGE.ordinal -> {
                 ImageViewHolder(
-                    ItemSearchImageBinding.inflate(context.layoutInflater, parent, false)
+                    ItemSearchImageBinding.inflate(parent.context.layoutInflater, parent, false)
                 )
             }
             SearchType.VIDEO.ordinal -> {
                 VideoViewHolder(
-                    ItemSearchVideoBinding.inflate(context.layoutInflater, parent, false)
+                    ItemSearchVideoBinding.inflate(parent.context.layoutInflater, parent, false)
                 )
             }
             else -> {
                 PageViewHolder(
-                    ItemSearchPageBinding.inflate(context.layoutInflater, parent, false)
+                    ItemSearchPageBinding.inflate(parent.context.layoutInflater, parent, false)
                 )
             }
+        }
+    }
+
+    override fun onBindViewHolder(
+        holder: BaseViewHolder<ViewDataBinding>,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        if (payloads.isNotEmpty()) {
+            payloads.forEach {
+                when (it) {
+                    SearchPayLoadType.FAVORITE -> {
+                        (holder as? BaseMediaViewHolder<*, *>)?.updateFavorite(adapterList[position].isFavorite)
+                    }
+                    else -> super.onBindViewHolder(holder, position, payloads)
+                }
+            }
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
         }
     }
 
@@ -90,59 +100,61 @@ class SearchAdapter(
         }
 
         abstract fun initViewHolder()
-        open fun unselectFavorite() = Unit
-
-        fun onItemClick(view: View) {
-            view.isSelected = !data.isFavorite
-            data.isFavorite = !data.isFavorite
-            onClick.invoke(data.isFavorite, data)
-        }
-
-        fun updateFavoriteBtnView() {
-            unselectFavorite()
-        }
+        abstract fun updateFavorite(isSelected: Boolean)
     }
 
     inner class ImageViewHolder(
         binding: ItemSearchImageBinding
     ) : BaseMediaViewHolder<ItemSearchImageBinding, SearchListData.ImageDocumentData>(binding) {
+
+        init {
+            binding.btnFavorite.setOnClickListener {
+                val data = adapterList[absoluteAdapterPosition]
+                val action = if (data.isFavorite) UpdateFavoriteActionType.DELETE else UpdateFavoriteActionType.ADD
+                onClick.invoke(action, data)
+            }
+        }
+
         override fun initViewHolder(): Unit = with(binding) {
+            ivThumbnail.setImage(null)
+            val context = binding.root.context
             val thumbWidth = context.getDimensionInt(R.dimen.search_thumbnail_width)
             val height = (data.height * thumbWidth / data.width).takeIf { it <= 300.toPx(context) }
                 ?: 300.toPx(context)
             ivThumbnail.layoutParams.height = height
             imageData = data
-            btnFavorite.apply {
-                isSelected = data.isFavorite
-                setOnClickListener {
-                    onItemClick(it)
-                }
-            }
+            btnFavorite.isSelected = data.isFavorite
         }
 
-        override fun unselectFavorite() = with(binding) {
-            btnFavorite.isSelected = false
+        override fun updateFavorite(isSelected: Boolean) = with(binding) {
+            btnFavorite.isSelected = isSelected
         }
     }
 
     inner class VideoViewHolder(
         binding: ItemSearchVideoBinding
     ) : BaseMediaViewHolder<ItemSearchVideoBinding, SearchListData.VideoDocumentData>(binding) {
+
+        init {
+            binding.btnFavorite.setOnClickListener {
+                val data = adapterList[absoluteAdapterPosition]
+                val action = if (data.isFavorite) UpdateFavoriteActionType.DELETE else UpdateFavoriteActionType.ADD
+                onClick.invoke(action, data)
+            }
+        }
+
         override fun initViewHolder(): Unit = with(binding) {
+            ivThumbnail.setImage(null)
+            val context = binding.root.context
             val thumbWidth = context.getDimensionInt(R.dimen.search_thumbnail_width)
             val height = 78 * thumbWidth / 138
             ivThumbnail.layoutParams.height = height
             videoData = data
-            btnFavorite.apply {
-                isSelected = data.isFavorite
-                setOnClickListener {
-                    onItemClick(it)
-                }
-            }
+            btnFavorite.isSelected = data.isFavorite
         }
 
-        override fun unselectFavorite() = with(binding) {
-            btnFavorite.isSelected = false
+        override fun updateFavorite(isSelected: Boolean) = with(binding) {
+            btnFavorite.isSelected = isSelected
         }
     }
 
@@ -151,13 +163,14 @@ class SearchAdapter(
     ) : BaseViewHolder<ItemSearchPageBinding>(binding) {
 
         init {
-            val layoutParams = this.itemView.layoutParams as StaggeredGridLayoutManager.LayoutParams
-            layoutParams.isFullSpan = true
+            val layoutParams =
+                this.itemView.layoutParams as? StaggeredGridLayoutManager.LayoutParams
+            layoutParams?.isFullSpan = true
         }
 
         override fun bind(position: Int) {
             val data = adapterList[position] as SearchListData.PageData
-            binding.tvPage.text = context.getString(R.string.text_page, data.page)
+            binding.tvPage.text = binding.root.context.getString(R.string.text_page, data.page)
         }
     }
 }

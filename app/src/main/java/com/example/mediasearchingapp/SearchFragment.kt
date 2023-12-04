@@ -1,51 +1,46 @@
 package com.example.mediasearchingapp
 
-import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
-import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.example.commonModelUtil.extension.getWindowWidth
-import com.example.commonModelUtil.extension.onEachState
-import com.example.commonModelUtil.data.SearchListData
-import com.example.commonModelUtil.extension.getDimensionInt
-import com.example.commonModelUtil.extension.showToast
-import com.example.commonModelUtil.util.PreferenceUtil
+import com.example.coreDomain.data.SearchListData
 import com.example.mediasearchingapp.adapter.SearchAdapter
 import com.example.mediasearchingapp.base.BaseFragment
+import com.example.mediasearchingapp.data.UpdateFavoriteActionType
 import com.example.mediasearchingapp.databinding.FragmentSearchBinding
+import com.example.mediasearchingapp.extension.getDimensionInt
+import com.example.mediasearchingapp.extension.getWindowWidth
+import com.example.mediasearchingapp.extension.showToast
+import com.example.mediasearchingapp.extension.textChangesFlow
+import com.example.mediasearchingapp.viewmodel.FavoriteSharedViewModel
 import com.example.mediasearchingapp.viewmodel.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.*
-import javax.inject.Inject
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
 class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
-    @Inject
-    lateinit var preferenceUtil: PreferenceUtil
     private val tag = SearchFragment::class.java.simpleName
 
     override val enableBackPressed = false
     private val searchViewModel: SearchViewModel by viewModels()
-    private val searchAdapter by lazy {
-        SearchAdapter(requireContext(), onItemClicked)
-    }
+    private val sharedViewModel: FavoriteSharedViewModel by activityViewModels()
+    private val searchAdapter by lazy { SearchAdapter(onItemClicked) }
 
-    private val onItemClicked: (Boolean, SearchListData) -> Unit = { action, data ->
-        if (action) {
-            preferenceUtil.putFavoriteData(data)
-        } else {
-            preferenceUtil.deleteFavoriteData(data.thumbnail)
+    private val onItemClicked: (UpdateFavoriteActionType, SearchListData) -> Unit =
+        { action, data ->
+            searchViewModel.editFavoriteItem(action, data)
+            sharedViewModel.updateFavoriteData(action, data)
         }
-    }
 
     override fun createFragmentBinding(
         inflater: LayoutInflater,
@@ -60,7 +55,11 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
         addListener()
         collectViewModel()
         rvSearch.apply {
-            layoutManager = getStaggeredLayoutManager()
+            val thumbWidth = requireContext().getDimensionInt(R.dimen.search_thumbnail_width)
+            val columnCnt = requireActivity().getWindowWidth() / thumbWidth
+            layoutManager = StaggeredGridLayoutManager(columnCnt, LinearLayoutManager.VERTICAL).apply {
+                gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
+            }
             itemAnimator = null
             adapter = searchAdapter
         }
@@ -68,16 +67,16 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
     private fun addListener() = with(binding) {
         with(etSearch) {
-            addTextChangedListener {
-                searchViewModel.setTyping(it?.isNotEmpty() == true)
-            }
-            setOnEditorActionListener { textView, actionId, keyEvent ->
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    searchViewModel.resetNewQuerySearch(textView.text.toString())
-                    searchViewModel.search()
+            textChangesFlow()
+                .onEach {
+                    searchViewModel.setTyping(it.isNotEmpty())
                 }
-                true
-            }
+                .debounce(500)
+                .onEach {
+                    if (it.isEmpty()) return@onEach
+                    searchViewModel.resetNewQuerySearch(it)
+                    searchViewModel.search()
+                }.launchIn(lifecycleScope)
         }
 
         rvSearch.addOnScrollListener(scrollListener)
@@ -93,22 +92,39 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
         }
     }
 
-    private fun collectViewModel() = with(searchViewModel) {
-        searchResult.onEachState(
-            success = {
-                if (isNewQuerySearch) {
-                    searchAdapter.set(it)
-                    binding.rvSearch.scrollToPosition(0)
-                    isNewQuerySearch = false
-                } else {
-                    searchAdapter.addSearchList(it)
+    private fun collectViewModel() {
+        with(searchViewModel) {
+            searchResult.observe { searchResult ->
+                when (searchResult) {
+                    is ResultState.Success -> {
+                        searchAdapter.submit(searchResult.data.list)
+
+                        when {
+                            searchResult.data.list.isEmpty() -> {
+                                requireContext().showToast(R.string.empty_list)
+                                searchViewModel.resetNewQuerySearch()
+                            }
+                            searchResult.data.isNewQuerySearch -> {
+                                binding.rvSearch.scrollToPosition(0)
+                            }
+                        }
+                    }
+                    is ResultState.Error -> {
+                        requireContext().showToast(R.string.error)
+                        Log.e(tag, "searchResult error : $searchResult")
+                    }
+                    else -> {}
                 }
-            },
-            error = {
-                requireContext().showToast(com.example.commonModelUtil.R.string.error)
-                Log.e(tag, "searchResult error : $it")
             }
-        ).launchIn(viewLifecycleOwner.lifecycleScope)
+        }
+
+        with(sharedViewModel) {
+            updateFavoriteDataState.launchInUiState(
+                success = {
+                    searchViewModel.editFavoriteItem(it.first, it.second)
+                }
+            )
+        }
     }
 
     private val scrollListener = object : RecyclerView.OnScrollListener() {
@@ -126,26 +142,5 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
             )
             searchViewModel.showBtnUp(positions[0] > 9)
         }
-    }
-
-    private fun getStaggeredLayoutManager(): StaggeredGridLayoutManager {
-        val thumbWidth = context?.getDimensionInt(R.dimen.search_thumbnail_width) ?: 150.px
-        val columnCnt = requireActivity().getWindowWidth() / thumbWidth
-        return StaggeredGridLayoutManager(columnCnt, LinearLayoutManager.VERTICAL).apply {
-            gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        searchAdapter.updateFavoriteBtn(searchViewModel.getFavoriteList())
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        if (newConfig.orientation != searchViewModel.prevOrientation) {
-            binding.rvSearch.layoutManager = getStaggeredLayoutManager()
-        }
-        searchViewModel.prevOrientation = newConfig.orientation
     }
 }

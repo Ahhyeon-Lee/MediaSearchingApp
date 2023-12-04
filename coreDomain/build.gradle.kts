@@ -16,6 +16,4 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
 
-    implementation(project(":coreNetwork"))
-    implementation(project(":commonModelUtil"))
 }

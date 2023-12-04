@@ -42,5 +42,6 @@ dependencies {
     kapt(libs.hilt.compiler)
 
     implementation(project(":coreDomain"))
-    implementation(project(":commonModelUtil"))
+    implementation(project(":corePreference"))
+    implementation(project(":coreNetwork"))
 }

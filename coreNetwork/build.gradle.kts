@@ -15,5 +15,5 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
 
-    implementation(project(":commonModelUtil"))
+    implementation(project(":coreDomain"))
 }

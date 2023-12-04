@@ -8,6 +8,7 @@ androidx-appcompat = "1.5.1"
 androidx-constraint = "2.1.4"
 androidx-activity = "1.5.1"
 androidx-fragment = "1.5.5"
+androidx-recyclerview = "1.2.1"
 androidx-navigation = "2.5.3"
 androidxSecurityCrypto = "1.0.0"
 
@@ -34,6 +35,7 @@ androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "a
 androidx-constraint = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraint" }
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity" }
 androidx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "androidx-fragment" }
+androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "androidx-recyclerview" }
 androidx-navigation-kts = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidx-navigation"}
 androidx-navigation-fragment = { module = "androidx.navigation:navigation-fragment", version.ref = "androidx-navigation"}
 androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "androidxSecurityCrypto" }
@@ -63,7 +65,7 @@ kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-pl
 
 [bundles]
 android = ["android-material"]
-androidx = ["androidx-core-ktx", "androidx-appcompat", "androidx-constraint", "androidx-activity", "androidx-fragment", "androidx-navigation-kts", "androidx-navigation-fragment"]
+androidx = ["androidx-core-ktx", "androidx-appcompat", "androidx-constraint", "androidx-activity", "androidx-fragment", "androidx-navigation-kts", "androidx-navigation-fragment", "androidx-recyclerview"]
 coroutine = ["coroutine-core", "coroutine-android"]
 network = ["retrofit", "retrofit-converter-gson", "retrofit-converter-scalars", "retrofit-jakewharton-flow-adapter", "okhttp", "okhttp-interceptor"]
 junit = ["junit", "test-junit", "test-espresso"]

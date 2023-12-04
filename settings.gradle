@@ -16,5 +16,5 @@ dependencyResolutionManagement {
 rootProject.name = "MediaSearchingApp"
 include ':app'
 include ':coreDomain'
-include ':commonModelUtil'
 include ':coreNetwork'
+include ':corePreference'

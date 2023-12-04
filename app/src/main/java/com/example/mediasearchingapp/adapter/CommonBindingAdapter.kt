@@ -3,8 +3,8 @@ package com.example.mediasearchingapp.adapter
 import android.view.View
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
-import com.example.commonModelUtil.extension.setImage
 import com.example.mediasearchingapp.R
+import com.example.mediasearchingapp.extension.setImage
 
 object CommonBindingAdapter {
 

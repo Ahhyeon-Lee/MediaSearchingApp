@@ -1,35 +1,33 @@
 package com.example.mediasearchingapp
 
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.commonModelUtil.data.SearchListData
-import com.example.commonModelUtil.extension.getDimensionInt
-import com.example.commonModelUtil.extension.getWindowWidth
-import com.example.commonModelUtil.util.PreferenceUtil
+import com.example.coreDomain.data.SearchListData
 import com.example.mediasearchingapp.adapter.ListAdapter
 import com.example.mediasearchingapp.base.BaseFragment
+import com.example.mediasearchingapp.data.UpdateFavoriteActionType
 import com.example.mediasearchingapp.databinding.FragmentMyListBinding
+import com.example.mediasearchingapp.extension.getDimensionInt
+import com.example.mediasearchingapp.extension.getWindowWidth
+import com.example.mediasearchingapp.viewmodel.FavoriteSharedViewModel
 import com.example.mediasearchingapp.viewmodel.ListViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MyListFragment : BaseFragment<FragmentMyListBinding>() {
 
-    @Inject
-    lateinit var preferenceUtil: PreferenceUtil
     override val enableBackPressed = false
     private val listViewModel: ListViewModel by viewModels()
-    private val listAdapter by lazy {
-        ListAdapter(requireContext(), onItemClicked)
-    }
+    private val sharedViewModel: FavoriteSharedViewModel by activityViewModels()
+    private val listAdapter by lazy { ListAdapter(onItemClicked) }
 
     private val onItemClicked: (SearchListData) -> Unit = { data ->
         listViewModel.deleteFavoriteData(data)
+        sharedViewModel.updateFavoriteData(UpdateFavoriteActionType.DELETE, data)
     }
 
     override fun createFragmentBinding(
@@ -40,34 +38,31 @@ class MyListFragment : BaseFragment<FragmentMyListBinding>() {
     override fun initFragment(savedInstanceState: Bundle?) {
         addListener()
         collectViewModel()
+        listViewModel.getFavoriteList()
     }
 
     private fun addListener() = with(binding) {
         rvList.apply {
-            layoutManager = getGridLayoutManager()
+            val thumbWidth = requireContext().getDimensionInt(R.dimen.list_thumbnail_width)
+            val columnCnt = requireActivity().getWindowWidth() / thumbWidth
+            layoutManager = GridLayoutManager(requireContext(), columnCnt)
             adapter = listAdapter
         }
     }
 
-    private fun collectViewModel() = with(listViewModel) {
-        favoriteListData.onResult {
-            listAdapter.updateList(it)
+    private fun collectViewModel() {
+        with(listViewModel) {
+            favoriteListData.onResult {
+                listAdapter.submit(it)
+            }
         }
-    }
 
-    private fun getGridLayoutManager(): GridLayoutManager {
-        val thumbWidth = context?.getDimensionInt(R.dimen.list_thumbnail_width) ?: 100.px
-        val columnCnt = requireActivity().getWindowWidth() / thumbWidth
-        return GridLayoutManager(requireContext(), columnCnt)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        listViewModel.getFavoriteList()
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        binding.rvList.layoutManager = getGridLayoutManager()
+        with(sharedViewModel) {
+            updateFavoriteDataState.launchInUiState(
+                success = {
+                    listViewModel.getFavoriteList()
+                }
+            )
+        }
     }
 }

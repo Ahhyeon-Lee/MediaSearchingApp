@@ -7,7 +7,7 @@
 
         <variable
             name="imageData"
-            type="com.example.commonModelUtil.data.SearchListData.ImageDocumentData" />
+            type="com.example.coreDomain.data.SearchListData" />
     </data>
 
     <LinearLayout
@@ -24,7 +24,7 @@
             <ImageView
                 android:id="@+id/ivThumbnail"
                 clipToOutLine="@{true}"
-                imageUrl="@{imageData.imageUrl}"
+                imageUrl="@{imageData.thumbnail}"
                 android:layout_width="@dimen/list_thumbnail_width"
                 android:layout_height="100dp"
                 android:adjustViewBounds="true"
